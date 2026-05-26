@@ -1,0 +1,24 @@
+# Node dependencies
+node_modules/
+
+# Environment variables (secrets)
+.env
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Package manager debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage reports
+coverage/
+
+# IDE/editor settings
+.vscode/
+.idea/
+

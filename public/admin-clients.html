@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clients — e-Hôtels</title>
+    <style>
+      :root {
+        --blue: #0d7bc4;
+        --blue-soft: rgba(13, 123, 196, 0.14);
+        --ink: #1a1a1a;
+        --muted: #6b6b6b;
+        --line: #e8eaed;
+        --paper: #f6f7f9;
+        --card: #fff;
+        --sans: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+        --serif: Georgia, "Times New Roman", ui-serif, serif;
+        --sidebar: 268px;
+        --max: 1100px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: var(--sidebar) 1fr;
+        min-height: 100vh;
+      }
+      aside {
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 1.5rem 1.1rem;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+      }
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        text-decoration: none;
+        color: var(--ink);
+      }
+      .logo-diamond {
+        width: 10px;
+        height: 10px;
+        background: var(--blue);
+        transform: rotate(45deg);
+      }
+      .logo-text {
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        color: var(--blue);
+      }
+      .nav-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        margin-bottom: 0.65rem;
+        font-weight: 600;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.65rem 0.75rem;
+        border-radius: 8px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+      }
+      .nav-item:hover {
+        background: var(--paper);
+        color: var(--ink);
+      }
+      .nav-item.active {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      .sidebar-hotel {
+        margin-top: auto;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+      .sidebar-hotel strong {
+        display: block;
+        margin-top: 0.35rem;
+        font-size: 0.75rem;
+        color: var(--ink);
+      }
+      .top-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.85rem 1.5rem;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
+        color: var(--blue);
+      }
+      .user-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .user-name {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .logout {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.66rem;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      main {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 1.5rem 1.5rem 2.5rem;
+      }
+      h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: 1.85rem;
+        font-weight: 500;
+      }
+      .sub {
+        color: var(--muted);
+        margin: 0.5rem 0 1.25rem;
+        font-size: 0.9rem;
+      }
+      .search {
+        margin-bottom: 1rem;
+      }
+      .search input {
+        width: 100%;
+        max-width: 360px;
+        padding: 0.65rem 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: inherit;
+      }
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.85rem 1rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.12em;
+        font-weight: 700;
+        color: var(--muted);
+        border-bottom: 1px solid var(--line);
+        background: #fafbfc;
+      }
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--line);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .msg {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: none;
+      }
+      .msg.show {
+        display: block;
+      }
+      .msg.err {
+        background: #fff5f5;
+        border: 1px solid #f0c4c4;
+        color: #8b2e2e;
+      }
+      .topbar {
+        display: none;
+      }
+      .toggle {
+        display: none;
+      }
+      @media (max-width: 940px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: min(300px, 88vw);
+          transform: translateX(-105%);
+          transition: transform 0.25s ease;
+          z-index: 40;
+          height: 100vh;
+        }
+        body.nav-open aside {
+          transform: translateX(0);
+        }
+        .topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: var(--card);
+          border-bottom: 1px solid var(--line);
+        }
+        .toggle {
+          display: inline-flex;
+          width: 2.75rem;
+          height: 2.5rem;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: #fff;
+          cursor: pointer;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside>
+        <a class="logo-row" href="/manager-dashboard.html">
+          <span class="logo-diamond"></span>
+          <span class="logo-text">E-HÔTELS</span>
+        </a>
+        <div class="nav-label">MENU</div>
+        <nav>
+          <a class="nav-item" href="/manager-dashboard.html">Tableau de bord</a>
+          <a class="nav-item" href="/admin-employes.html">Employés</a>
+          <a class="nav-item" href="/admin-chambres.html">Chambres</a>
+          <a class="nav-item active" href="/admin-clients.html">Clients</a>
+        </nav>
+        <div class="sidebar-hotel">
+          HÔTEL ACTUEL
+          <strong id="sidebarHotel">—</strong>
+        </div>
+      </aside>
+      <div class="main-col">
+        <div class="topbar">
+          <button class="toggle" type="button" id="btnMenu">☰</button>
+          <span class="brand">E-HÔTELS</span>
+          <span style="width: 2.75rem"></span>
+        </div>
+        <header class="top-header">
+          <span class="brand">E-HÔTELS</span>
+          <div class="user-row">
+            <span class="user-name" id="headerUser">—</span>
+            <button type="button" class="logout" id="btnLogout">Déconnexion</button>
+          </div>
+        </header>
+        <main>
+          <div class="msg err" id="msg"></div>
+          <h1>Clients</h1>
+          <p class="sub">Annuaire clients (recherche par nom, email ou n° client).</p>
+          <div class="search">
+            <input type="search" id="q" placeholder="Rechercher…" autocomplete="off" />
+          </div>
+          <div class="panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>NOM</th>
+                  <th>EMAIL</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script>
+      const LS_ID = "ehotels.userId";
+      const LS_ROLE = "ehotels.role";
+      const LS_HOTEL = "ehotels.hotelId";
+      const LS_NAME = "ehotels.nom";
+
+      function normalizeRole(r) {
+        return String(r || "").trim().toLowerCase();
+      }
+
+      function pick(r, keys) {
+        for (const k of keys) {
+          if (r && r[k] != null && String(r[k]).trim() !== "") return r[k];
+        }
+        return "—";
+      }
+
+      function gate() {
+        const role = normalizeRole(localStorage.getItem(LS_ROLE));
+        if (role !== "gestionnaire" && role !== "manager") {
+          window.location.href =
+            role === "client" ? "/client-recherche.html" : "/employe-reservations.html";
+          return null;
+        }
+        if (!localStorage.getItem(LS_ID)) {
+          window.location.href = "/login.html";
+          return null;
+        }
+        return { hotelId: localStorage.getItem(LS_HOTEL) };
+      }
+
+      let timer;
+      async function load(q) {
+        const s = gate();
+        if (!s) return;
+        document.getElementById("headerUser").textContent = (
+          localStorage.getItem(LS_NAME) || "Gestionnaire"
+        ).toUpperCase();
+        document.getElementById("sidebarHotel").textContent = s.hotelId
+          ? "Réf. #" + s.hotelId
+          : "—";
+
+        try {
+          const url = "/clients" + (q ? "?q=" + encodeURIComponent(q) : "");
+          const res = await fetch(url);
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || data.message);
+          const tbody = document.getElementById("tbody");
+          tbody.innerHTML = "";
+          (Array.isArray(data) ? data : []).forEach((row) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = "<td></td><td></td><td></td>";
+            tr.cells[0].textContent = pick(row, ["id_client", "ID_CLIENT"]);
+            tr.cells[1].textContent = pick(row, ["nom", "NOM"]);
+            tr.cells[2].textContent = pick(row, ["email", "EMAIL"]);
+            tbody.appendChild(tr);
+          });
+          if (!tbody.children.length) {
+            tbody.innerHTML = "<tr><td colspan='3'>Aucun résultat.</td></tr>";
+          }
+        } catch (e) {
+          document.getElementById("msg").textContent = e.message || "Erreur.";
+          document.getElementById("msg").classList.add("show");
+        }
+      }
+
+      document.getElementById("q").addEventListener("input", (e) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => load(e.target.value.trim()), 300);
+      });
+
+      document.getElementById("btnLogout").addEventListener("click", () => {
+        localStorage.removeItem(LS_ID);
+        localStorage.removeItem(LS_ROLE);
+        localStorage.removeItem(LS_HOTEL);
+        localStorage.removeItem(LS_NAME);
+        window.location.href = "/login.html";
+      });
+      document.getElementById("btnMenu")?.addEventListener("click", () => document.body.classList.toggle("nav-open"));
+      load("");
+    </script>
+  </body>
+</html>

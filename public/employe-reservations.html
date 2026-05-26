@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Réservations en attente — e-Hôtels</title>
+    <style>
+      :root {
+        --blue: #4da3ff;
+        --blue-soft: rgba(77, 163, 255, 0.16);
+        --blue-hover: #6eb6ff;
+        --ink: #f2f2f5;
+        --muted: #9494a3;
+        --line: #2c2c32;
+        --paper: #000000;
+        --card: #0f0f12;
+        --input-bg: #16161a;
+        --sans: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+        --sidebar: 268px;
+        --max: 1200px;
+      }
+      html {
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.9375rem;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: var(--sidebar) 1fr;
+        min-height: 100vh;
+      }
+      aside {
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 1.5rem 1.1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+      }
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        text-decoration: none;
+        color: var(--ink);
+      }
+      .logo-diamond {
+        width: 10px;
+        height: 10px;
+        background: var(--blue);
+        transform: rotate(45deg);
+        flex-shrink: 0;
+      }
+      .logo-text {
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        color: var(--ink);
+      }
+      .nav-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        margin-bottom: 0.65rem;
+        font-weight: 600;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.65rem 0.75rem;
+        border-radius: 8px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.25rem;
+        border: 1px solid transparent;
+      }
+      .nav-item svg {
+        flex-shrink: 0;
+        opacity: 0.85;
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--ink);
+      }
+      .nav-item.active {
+        background: var(--blue-soft);
+        color: var(--blue);
+        border-color: rgba(77, 163, 255, 0.35);
+      }
+      .nav-item.active svg {
+        stroke: var(--blue);
+      }
+      .nav-item.muted {
+        opacity: 0.55;
+        cursor: default;
+        pointer-events: none;
+      }
+      .sidebar-hotel {
+        margin-top: auto;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .sidebar-hotel strong {
+        display: block;
+        color: var(--ink);
+        letter-spacing: 0.08em;
+        font-size: 0.72rem;
+        margin-top: 0.35rem;
+        font-weight: 600;
+      }
+      .main-col {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .top-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding: 0.85rem 1.5rem;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+      }
+      .user-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+      }
+      .user-name {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .logout {
+        border: 1px solid var(--line);
+        background: var(--input-bg);
+        color: var(--ink);
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.66rem;
+        font-family: inherit;
+      }
+      .logout:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+      .topbar {
+        display: none;
+      }
+      main {
+        flex: 1;
+        padding: 1.75rem 1.5rem 2.5rem;
+      }
+      .wrap {
+        max-width: var(--max);
+        margin: 0 auto;
+      }
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+      }
+      @media (max-width: 900px) {
+        .kpi-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .kpi {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 1.1rem 1.2rem;
+      }
+      .kpi-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.16em;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 0.45rem;
+      }
+      .kpi-val {
+        font-size: 1.65rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .section-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      .section-head h1 {
+        margin: 0;
+        font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .section-sub {
+        margin: 0.4rem 0 0;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .section-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .btn-ghost {
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--ink);
+        padding: 0.45rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn-ghost:hover {
+        border-color: var(--muted);
+        color: var(--ink);
+      }
+      .btn-ghost:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .msg {
+        margin-bottom: 1rem;
+        padding: 0.85rem 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        display: none;
+        font-size: 0.88rem;
+      }
+      .msg.err {
+        border-color: #5c2a2a;
+        background: rgba(90, 40, 40, 0.35);
+        color: #ffb8b8;
+      }
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .table-scroll {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.85rem 1.15rem;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        border-bottom: 1px solid var(--line);
+        background: #08080a;
+        white-space: nowrap;
+      }
+      td {
+        padding: 1.1rem 1.15rem;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .client-name {
+        font-weight: 700;
+        font-size: 0.92rem;
+      }
+      .client-ref {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+        letter-spacing: 0.04em;
+      }
+      .room-title {
+        font-weight: 600;
+      }
+      .room-sub {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 0.3rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .period-dates {
+        font-weight: 600;
+      }
+      .period-dur {
+        font-size: 0.65rem;
+        color: var(--muted);
+        margin-top: 0.35rem;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+      }
+      .cell-tarif {
+        font-size: 1.05rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        padding: 0.55rem 1rem;
+        background: var(--blue);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+        transition: background 0.15s ease;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background: var(--blue-hover);
+      }
+      .btn-primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+      .table-footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem 1.15rem;
+        border-top: 1px solid var(--line);
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .pager {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .pager button {
+        border: 1px solid var(--line);
+        background: var(--input-bg);
+        color: var(--ink);
+        padding: 0.35rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .pager button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .site-footer {
+        max-width: var(--max);
+        margin: 2rem auto 0;
+        padding: 1.25rem 0 0;
+        border-top: 1px solid var(--line);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.65rem;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .site-footer a {
+        color: var(--muted);
+        text-decoration: none;
+        margin-left: 1rem;
+      }
+      .site-footer a:hover {
+        color: var(--blue);
+      }
+      .empty-cell {
+        text-align: center;
+        padding: 2.5rem 1rem !important;
+        color: var(--muted);
+      }
+      .toggle {
+        display: none;
+      }
+      @media (max-width: 940px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: min(300px, 88vw);
+          transform: translateX(-105%);
+          transition: transform 0.25s ease;
+          z-index: 40;
+          box-shadow: 8px 0 40px rgba(0, 0, 0, 0.75);
+        }
+        body.nav-open aside {
+          transform: translateX(0);
+        }
+        .topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: var(--card);
+          border-bottom: 1px solid var(--line);
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          color: var(--ink);
+        }
+        .toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 2.75rem;
+          height: 2.5rem;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--input-bg);
+          color: var(--ink);
+          cursor: pointer;
+          font-size: 1rem;
+        }
+        .top-header {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+        main {
+          padding: 1rem 1rem 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body data-page="employe-reservations">
+    <div class="layout">
+      <aside aria-label="Navigation employé">
+        <a class="logo-row" href="/employe-reservations.html">
+          <span class="logo-diamond" aria-hidden="true"></span>
+          <span class="logo-text">E-HÔTELS</span>
+        </a>
+        <div class="nav-label">MENU</div>
+        <nav>
+          <a class="nav-item active" href="/employe-reservations.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+            RÉSERVATIONS
+          </a>
+          <a class="nav-item" href="/employe-location-directe.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M2 20h20M4 20V10l8-6 8 6v10" />
+              <path d="M9 20v-6h6v6" />
+            </svg>
+            NOUVELLE LOCATION
+          </a>
+        </nav>
+        <div class="sidebar-hotel">
+          HÔTEL ACTUEL
+          <strong id="sidebarHotel">—</strong>
+        </div>
+      </aside>
+
+      <div class="main-col">
+        <div class="topbar">
+          <button class="toggle" type="button" id="btnMenu" aria-label="Menu">☰</button>
+          <span style="font-weight: 700; font-size: 0.72rem; letter-spacing: 0.12em">E-HÔTELS</span>
+          <span style="width: 2.75rem" aria-hidden="true"></span>
+        </div>
+        <header class="top-header">
+          <div class="user-pill">
+            <span class="user-name" id="headerUserName">EMPLOYÉ</span>
+            <button class="logout" type="button" id="btnLogout">Déconnexion</button>
+          </div>
+        </header>
+
+        <main>
+          <div class="wrap">
+            <div class="kpi-row" aria-label="Indicateurs">
+              <div class="kpi">
+                <div class="kpi-label">ARRIVÉES DU JOUR</div>
+                <div class="kpi-val" id="kpiArrivees">—</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">CHAMBRES (ÉTABLISSEMENT)</div>
+                <div class="kpi-val" id="kpiChambres">—</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">ACTION REQUISE</div>
+                <div class="kpi-val" id="kpiAction">—</div>
+              </div>
+            </div>
+
+            <div class="section-head">
+              <div>
+                <h1>Réservations en attente</h1>
+                <p class="section-sub" id="sectionSub">MISE À JOUR — CHARGEMENT</p>
+              </div>
+              <div class="section-actions">
+                <button type="button" class="btn-ghost" id="btnFiltres" disabled title="Bientôt">FILTRES</button>
+                <button type="button" class="btn-ghost" id="btnExport" disabled title="Bientôt">EXPORTER RAPPORT</button>
+              </div>
+            </div>
+
+            <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+            <div class="panel" aria-label="Liste des réservations">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>CLIENT</th>
+                      <th>DÉTAILS CHAMBRE</th>
+                      <th>PÉRIODE DE SÉJOUR</th>
+                      <th>TARIF TOTAL</th>
+                      <th>ACTIONS</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody"></tbody>
+                </table>
+              </div>
+              <div class="table-footer">
+                <span id="tableHint">AFFICHAGE —</span>
+                <div class="pager">
+                  <button type="button" id="btnPrev" disabled>PRÉCÉDENT</button>
+                  <span id="pageLabel">PAGE 1 DE 1</span>
+                  <button type="button" id="btnNext" disabled>SUIVANT</button>
+                </div>
+              </div>
+            </div>
+
+            <footer class="site-footer">
+              <span>© 2026 E-HÔTELS EXCELLENCE GROUP</span>
+              <span>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Concierge</a>
+              </span>
+            </footer>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const LS_ID = "ehotels.userId";
+      const LS_ROLE = "ehotels.role";
+      const LS_HOTEL = "ehotels.hotelId";
+      const LS_NAME = "ehotels.nom";
+
+      function normalizeRole(r) {
+        return String(r || "").trim().toLowerCase();
+      }
+
+      function mustBeLoggedIn() {
+        const id = localStorage.getItem(LS_ID);
+        const role = normalizeRole(localStorage.getItem(LS_ROLE));
+        const hotelId = localStorage.getItem(LS_HOTEL);
+        if (!id || !role) window.location.href = "/login.html";
+        if (role === "client") window.location.href = "/client-recherche.html";
+        if (role === "gestionnaire" || role === "manager") window.location.href = "/manager-dashboard.html";
+        if (!hotelId) {
+          setMsg("err", "Votre session ne contient pas l’ID de l’hôtel. Reconnectez-vous.");
+        }
+        return { id, role, hotelId };
+      }
+
+      function setMsg(kind, text) {
+        const el = document.getElementById("msg");
+        el.className = "msg" + (kind === "err" ? " err" : "");
+        el.textContent = text;
+        el.style.display = "block";
+      }
+
+      function hideMsg() {
+        const el = document.getElementById("msg");
+        el.style.display = "none";
+        el.textContent = "";
+      }
+
+      function pickField(r, keys) {
+        for (const k of keys) {
+          if (r && r[k] != null && String(r[k]).trim() !== "") return r[k];
+        }
+        return "";
+      }
+
+      function parseDateOnly(x) {
+        if (!x) return null;
+        const d = new Date(x);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      function startOfDay(d) {
+        const t = new Date(d);
+        t.setHours(0, 0, 0, 0);
+        return t;
+      }
+
+      function isSameCalendarDay(a, b) {
+        return startOfDay(a).getTime() === startOfDay(b).getTime();
+      }
+
+      function nightsBetween(d1, d2) {
+        const a = parseDateOnly(d1);
+        const b = parseDateOnly(d2);
+        if (!a || !b) return 1;
+        const ms = b.getTime() - a.getTime();
+        const n = Math.ceil(ms / 86400000);
+        return Math.max(1, n);
+      }
+
+      function formatDateShort(x) {
+        const d = parseDateOnly(x);
+        if (!d) return "—";
+        return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+      }
+
+      function formatTarif(r, d1, d2) {
+        const prix = pickField(r, ["prix_chambre", "PRIX_CHAMBRE", "prix", "PRIX"]);
+        const p = parseFloat(String(prix).replace(",", "."));
+        if (!Number.isFinite(p)) return "—";
+        const n = nightsBetween(d1, d2);
+        const total = Math.round(p * n);
+        return total.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+      }
+
+      function countArrivalsToday(rows) {
+        const today = new Date();
+        let n = 0;
+        rows.forEach((r) => {
+          const d1 = pickField(r, ["date_debut", "DATE_DEBUT"]);
+          const sd = parseDateOnly(d1);
+          if (sd && isSameCalendarDay(sd, today)) n++;
+        });
+        return n;
+      }
+
+      async function fetchChambresCount(hotelId) {
+        try {
+          const res = await fetch("/chambres/" + encodeURIComponent(hotelId));
+          if (!res.ok) return null;
+          const data = await res.json();
+          return Array.isArray(data) ? data.length : null;
+        } catch {
+          return null;
+        }
+      }
+
+      function renderRow(r) {
+        const idRes = pickField(r, ["id_reservation", "ID_RESERVATION", "id", "ID"]);
+        const clientNom = pickField(r, ["client_nom", "CLIENT_NOM", "client", "nom_client", "NOM_CLIENT"]);
+        const idClient = pickField(r, ["id_client", "ID_CLIENT"]);
+        const displayName = clientNom || (idClient ? "Client #" + idClient : "—");
+        const chambre = pickField(r, ["id_chambre", "ID_CHAMBRE", "chambre", "numero_chambre", "NUMERO_CHAMBRE"]);
+        const vue = pickField(r, ["vue_chambre", "VUE_CHAMBRE", "vue", "VUE"]);
+        const d1 = pickField(r, ["date_debut", "DATE_DEBUT", "debut", "start_date"]);
+        const d2 = pickField(r, ["date_fin", "DATE_FIN", "fin", "end_date"]);
+        const nuits = nightsBetween(d1, d2);
+        const tarif = formatTarif(r, d1, d2);
+
+        const tr = document.createElement("tr");
+
+        const tdClient = document.createElement("td");
+        const cn = document.createElement("div");
+        cn.className = "client-name";
+        cn.textContent = displayName;
+        const ref = document.createElement("div");
+        ref.className = "client-ref";
+        ref.textContent = idRes ? "RES-" + idRes : "—";
+        tdClient.appendChild(cn);
+        tdClient.appendChild(ref);
+
+        const tdRoom = document.createElement("td");
+        const rt = document.createElement("div");
+        rt.className = "room-title";
+        rt.textContent = chambre ? "Chambre n° " + chambre : "Chambre —";
+        const rs = document.createElement("div");
+        rs.className = "room-sub";
+        rs.textContent = vue ? "(" + String(vue).toUpperCase() + ")" : "—";
+        tdRoom.appendChild(rt);
+        tdRoom.appendChild(rs);
+
+        const tdPeriod = document.createElement("td");
+        const pd = document.createElement("div");
+        pd.className = "period-dates";
+        pd.textContent = d1 && d2 ? formatDateShort(d1) + "  →  " + formatDateShort(d2) : "—";
+        const du = document.createElement("div");
+        du.className = "period-dur";
+        du.textContent = "DURÉE : " + nuits + " NUIT" + (nuits > 1 ? "S" : "");
+        tdPeriod.appendChild(pd);
+        tdPeriod.appendChild(du);
+
+        const tdTarif = document.createElement("td");
+        tdTarif.className = "cell-tarif";
+        tdTarif.textContent = tarif;
+
+        const tdAct = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-primary";
+        btn.textContent = "Convertir en location";
+
+        btn.addEventListener("click", async () => {
+          if (!idRes) {
+            setMsg("err", "Identifiant réservation manquant.");
+            return;
+          }
+          btn.disabled = true;
+          const idEmploye = parseInt(String(localStorage.getItem(LS_ID)), 10);
+          if (!Number.isFinite(idEmploye)) {
+            setMsg("err", "Session employé invalide : reconnectez-vous pour obtenir votre identifiant.");
+            btn.disabled = false;
+            return;
+          }
+          try {
+            const res2 = await fetch("/reservations/" + encodeURIComponent(idRes) + "/checkin", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id_employe: idEmploye }),
+            });
+            const t2 = await res2.text();
+            let d2j = null;
+            try {
+              d2j = t2 ? JSON.parse(t2) : null;
+            } catch {
+              d2j = null;
+            }
+            if (!res2.ok) {
+              const msg = (d2j && (d2j.error || d2j.message)) || "Conversion impossible.";
+              setMsg("err", msg);
+              btn.disabled = false;
+              return;
+            }
+            await load(true);
+            setMsg("", "Check-in effectué. Réservation convertie en location.");
+            btn.disabled = false;
+          } catch (e) {
+            setMsg("err", "Erreur réseau : veuillez réessayer.");
+            btn.disabled = false;
+          }
+        });
+
+        tdAct.appendChild(btn);
+        tr.appendChild(tdClient);
+        tr.appendChild(tdRoom);
+        tr.appendChild(tdPeriod);
+        tr.appendChild(tdTarif);
+        tr.appendChild(tdAct);
+        return tr;
+      }
+
+      async function load(silent) {
+        const { hotelId } = mustBeLoggedIn();
+        document.getElementById("sidebarHotel").textContent = hotelId ? "Réf. hôtel #" + hotelId : "—";
+        const nom = localStorage.getItem(LS_NAME);
+        document.getElementById("headerUserName").textContent = nom ? String(nom).toUpperCase() : "EMPLOYÉ";
+
+        if (!hotelId) return;
+
+        const tbody = document.getElementById("tbody");
+        tbody.innerHTML = "";
+        if (!silent) setMsg("", "Chargement…");
+
+        try {
+          const [res, chambresN] = await Promise.all([
+            fetch("/reservations/attente/" + encodeURIComponent(hotelId)),
+            fetchChambresCount(hotelId),
+          ]);
+
+          const t = await res.text();
+          let d = null;
+          try {
+            d = t ? JSON.parse(t) : null;
+          } catch {
+            d = null;
+          }
+          if (!res.ok) {
+            const msg = (d && (d.error || d.message)) || "Impossible de charger les réservations en attente.";
+            setMsg("err", msg);
+            document.getElementById("kpiArrivees").textContent = "—";
+            document.getElementById("kpiChambres").textContent = chambresN != null ? String(chambresN) : "—";
+            document.getElementById("kpiAction").textContent = "—";
+            return;
+          }
+
+          const rows = Array.isArray(d) ? d : d?.rows || d?.data || [];
+          if (!silent) hideMsg();
+
+          document.getElementById("kpiArrivees").textContent = String(countArrivalsToday(rows));
+          document.getElementById("kpiChambres").textContent = chambresN != null ? String(chambresN) : "—";
+          document.getElementById("kpiAction").textContent = String(rows.length);
+
+          const n = rows.length;
+          document.getElementById("sectionSub").textContent =
+            "MISE À JOUR EN TEMPS RÉEL — " + n + " DOSSIER" + (n !== 1 ? "S" : "") + " EN ATTENTE";
+
+          if (!rows.length) {
+            if (!silent) setMsg("", "Aucune réservation en attente.");
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 5;
+            td.className = "empty-cell";
+            td.textContent = "Aucune réservation en attente.";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            document.getElementById("tableHint").textContent = "AFFICHAGE DE 0 RÉSERVATION";
+            return;
+          }
+
+          rows.forEach((r) => tbody.appendChild(renderRow(r)));
+          document.getElementById("tableHint").textContent =
+            "AFFICHAGE DE " + n + " SUR " + n + " RÉSERVATION" + (n > 1 ? "S" : "") + " RESTANTE" + (n > 1 ? "S" : "");
+          if (!silent) setMsg("", n + " réservation(s) en attente.");
+        } catch (e) {
+          setMsg("err", "Erreur réseau : vérifiez que le serveur est accessible.");
+        }
+      }
+
+      (function init() {
+        document.getElementById("btnLogout").addEventListener("click", (e) => {
+          e.preventDefault();
+          localStorage.removeItem(LS_ID);
+          localStorage.removeItem(LS_ROLE);
+          localStorage.removeItem(LS_HOTEL);
+          localStorage.removeItem(LS_NAME);
+          window.location.href = "/login.html";
+        });
+        const btnMenu = document.getElementById("btnMenu");
+        if (btnMenu) btnMenu.addEventListener("click", () => document.body.classList.toggle("nav-open"));
+        load();
+      })();
+    </script>
+  </body>
+</html>

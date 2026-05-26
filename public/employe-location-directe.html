@@ -1,0 +1,1141 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nouvelle location directe — e-Hôtels</title>
+    <style>
+      :root {
+        --blue: #4da3ff;
+        --blue-soft: rgba(77, 163, 255, 0.16);
+        --blue-bar: #4da3ff;
+        --blue-hover: #6eb6ff;
+        --ink: #f2f2f5;
+        --muted: #9494a3;
+        --line: #2c2c32;
+        --paper: #000000;
+        --card: #0f0f12;
+        --input-bg: #16161a;
+        --sans: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+        --sidebar: 268px;
+        --summary: 320px;
+      }
+      html {
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.9375rem;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: var(--sidebar) 1fr;
+        min-height: 100vh;
+      }
+      aside {
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 1.5rem 1.1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+      }
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        text-decoration: none;
+        color: var(--ink);
+      }
+      .logo-diamond {
+        width: 10px;
+        height: 10px;
+        background: var(--blue);
+        transform: rotate(45deg);
+      }
+      .logo-text {
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        color: var(--ink);
+      }
+      .nav-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        margin-bottom: 0.65rem;
+        font-weight: 600;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.65rem 0.75rem;
+        border-radius: 0 8px 8px 0;
+        margin-left: -0.35rem;
+        padding-left: 1rem;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        border: 1px solid transparent;
+        border-left: 3px solid transparent;
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--ink);
+      }
+      .nav-item.active {
+        background: var(--blue-soft);
+        color: var(--blue);
+        border-left-color: var(--blue-bar);
+      }
+      .nav-item.active svg {
+        stroke: var(--blue);
+      }
+      .sidebar-hotel {
+        margin-top: auto;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+      .sidebar-hotel strong {
+        display: block;
+        color: var(--ink);
+        letter-spacing: 0.06em;
+        font-size: 0.72rem;
+        margin-top: 0.35rem;
+        font-weight: 600;
+      }
+      .main-col {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .top-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding: 0.85rem 1.5rem;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+      }
+      .user-name {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .logout {
+        border: 1px solid var(--line);
+        background: var(--input-bg);
+        color: var(--ink);
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.66rem;
+        font-family: inherit;
+      }
+      .logout:hover {
+        color: var(--blue);
+        border-color: var(--blue);
+      }
+      .topbar {
+        display: none;
+      }
+      .page-body {
+        flex: 1;
+        padding: 1.5rem 1.25rem 2rem;
+      }
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1fr min(var(--summary), 100%);
+        gap: 1.5rem;
+        align-items: start;
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      @media (max-width: 1024px) {
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .page-sub {
+        margin: 0.5rem 0 1.5rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+        max-width: 40rem;
+        line-height: 1.45;
+      }
+      .section {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.25rem 1.35rem;
+        margin-bottom: 1.25rem;
+      }
+      .section-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.65rem;
+        height: 1.65rem;
+        border-radius: 50%;
+        background: var(--blue-soft);
+        color: var(--blue);
+        font-size: 0.75rem;
+        font-weight: 800;
+        margin-right: 0.5rem;
+      }
+      .section-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        margin: 0 0 1rem;
+        display: flex;
+        align-items: center;
+      }
+      .search-wrap {
+        position: relative;
+      }
+      .search-wrap input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 0.9rem;
+        background: var(--input-bg);
+        color: var(--ink);
+      }
+      .search-wrap input:focus {
+        outline: none;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px var(--blue-soft);
+      }
+      .search-hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.45rem;
+      }
+      .client-results {
+        list-style: none;
+        margin: 0.5rem 0 0;
+        padding: 0;
+        max-height: 220px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--card);
+        display: none;
+      }
+      .client-results.open {
+        display: block;
+      }
+      .client-results li button {
+        width: 100%;
+        text-align: left;
+        padding: 0.65rem 1rem;
+        border: none;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.88rem;
+      }
+      .client-results li:last-child button {
+        border-bottom: none;
+      }
+      .client-results li button:hover {
+        background: var(--paper);
+      }
+      .client-card {
+        margin-top: 1rem;
+        padding: 1rem 1.1rem;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        display: none;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      .client-card.visible {
+        display: flex;
+      }
+      .client-ph {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--line);
+        flex-shrink: 0;
+      }
+      .client-card-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .client-card-name {
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .client-card-meta {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin-top: 0.35rem;
+      }
+      .link-edit {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--blue);
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-family: inherit;
+        text-decoration: underline;
+        padding: 0;
+      }
+      .btn-dashed {
+        width: 100%;
+        margin-top: 1rem;
+        padding: 0.85rem;
+        border: 2px dashed var(--line);
+        border-radius: 10px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: not-allowed;
+        font-family: inherit;
+      }
+      .dates-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 560px) {
+        .dates-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .field label {
+        display: block;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin-bottom: 0.4rem;
+      }
+      .field input[type="date"] {
+        width: 100%;
+        padding: 0.65rem 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: inherit;
+        background: var(--input-bg);
+        color: var(--ink);
+      }
+      .rooms-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .rooms-count {
+        font-size: 0.8rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .room-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.75rem;
+      }
+      .room-card {
+        position: relative;
+        border: 2px solid var(--line);
+        border-radius: 10px;
+        padding: 0.85rem 0.75rem;
+        cursor: pointer;
+        background: var(--input-bg);
+        color: var(--ink);
+        transition: border-color 0.15s, box-shadow 0.15s;
+        text-align: left;
+        font-family: inherit;
+      }
+      .room-card:hover {
+        border-color: #3d4550;
+      }
+      .room-card.selected {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px var(--blue-soft);
+      }
+      .room-card .check {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        color: transparent;
+      }
+      .room-card.selected .check {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #fff;
+      }
+      .room-num {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+      }
+      .room-type {
+        font-weight: 700;
+        font-size: 0.88rem;
+        margin-top: 0.25rem;
+        line-height: 1.25;
+      }
+      .room-vue {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 0.35rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .room-price {
+        margin-top: 0.5rem;
+        font-weight: 700;
+        color: var(--blue);
+        font-size: 0.85rem;
+      }
+      .rooms-placeholder {
+        color: var(--muted);
+        font-size: 0.88rem;
+        padding: 1rem 0;
+      }
+      .summary-panel {
+        position: sticky;
+        top: 1rem;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.35rem 1.25rem;
+      }
+      .summary-panel h2 {
+        margin: 0 0 1rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .sum-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.85rem;
+        margin-bottom: 0.65rem;
+        color: var(--ink);
+      }
+      .sum-line span:first-child {
+        color: var(--muted);
+      }
+      .sum-total {
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--line);
+      }
+      .sum-total-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.14em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .sum-total-val {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--blue);
+        margin-top: 0.25rem;
+      }
+      .emp-block {
+        margin-top: 1.35rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+      }
+      .emp-block h3 {
+        margin: 0 0 0.75rem;
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .emp-opt {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+      .emp-opt input {
+        accent-color: var(--blue);
+      }
+      .btn-submit {
+        width: 100%;
+        margin-top: 1.25rem;
+        padding: 0.9rem 1rem;
+        background: var(--blue);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn-submit:hover:not(:disabled) {
+        background: var(--blue-hover);
+      }
+      .btn-submit:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .note-box {
+        margin-top: 1.15rem;
+        padding: 0.85rem;
+        background: var(--blue-soft);
+        border-radius: 8px;
+        font-size: 0.78rem;
+        color: #c8d8ec;
+        line-height: 1.45;
+      }
+      .msg {
+        margin: 0 0 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        display: none;
+        font-size: 0.88rem;
+      }
+      .msg.show {
+        display: block;
+      }
+      .msg.err {
+        background: rgba(90, 40, 40, 0.35);
+        border: 1px solid #5c2a2a;
+        color: #ffb8b8;
+      }
+      .msg.ok {
+        background: rgba(35, 70, 45, 0.4);
+        border: 1px solid #2a5c3a;
+        color: #9ee6b8;
+      }
+      .toggle {
+        display: none;
+      }
+      @media (max-width: 940px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: min(300px, 88vw);
+          transform: translateX(-105%);
+          transition: transform 0.25s ease;
+          z-index: 40;
+          box-shadow: 8px 0 40px rgba(0, 0, 0, 0.75);
+        }
+        body.nav-open aside {
+          transform: translateX(0);
+        }
+        .topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: var(--card);
+          border-bottom: 1px solid var(--line);
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          color: var(--ink);
+        }
+        .toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 2.75rem;
+          height: 2.5rem;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--input-bg);
+          color: var(--ink);
+          cursor: pointer;
+        }
+      }
+    </style>
+  </head>
+  <body data-page="employe-location">
+    <div class="layout">
+      <aside aria-label="Navigation employé">
+        <a class="logo-row" href="/employe-reservations.html">
+          <span class="logo-diamond" aria-hidden="true"></span>
+          <span class="logo-text">E-HÔTELS</span>
+        </a>
+        <div class="nav-label">MENU</div>
+        <nav>
+          <a class="nav-item" href="/employe-reservations.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+            RÉSERVATIONS
+          </a>
+          <a class="nav-item active" href="/employe-location-directe.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M2 20h20M4 20V10l8-6 8 6v10" />
+              <path d="M9 20v-6h6v6" />
+            </svg>
+            NOUVELLE LOCATION
+          </a>
+        </nav>
+        <div class="sidebar-hotel">
+          HÔTEL ACTUEL
+          <strong id="sidebarHotel">—</strong>
+        </div>
+      </aside>
+
+      <div class="main-col">
+        <div class="topbar">
+          <button class="toggle" type="button" id="btnMenu" aria-label="Menu">☰</button>
+          <span style="font-weight: 700; font-size: 0.72rem; letter-spacing: 0.12em">E-HÔTELS</span>
+          <span style="width: 2.75rem" aria-hidden="true"></span>
+        </div>
+        <header class="top-header">
+          <span class="user-name" id="headerUserName">EMPLOYÉ</span>
+          <button class="logout" type="button" id="btnLogout">Déconnexion</button>
+        </header>
+
+        <div class="page-body">
+          <div class="content-grid">
+            <div class="main-form">
+              <h1>Nouvelle location directe</h1>
+              <p class="page-sub">
+                Enregistrez un séjour sur place : identifiez le client, choisissez les dates puis une chambre libre de votre établissement.
+              </p>
+
+              <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+              <div class="section">
+                <h2 class="section-title"><span class="section-num">1</span> IDENTIFICATION DU CLIENT</h2>
+                <div class="search-wrap">
+                  <input
+                    type="search"
+                    id="clientSearch"
+                    placeholder="Rechercher par nom, email ou numéro de client…"
+                    autocomplete="off"
+                  />
+                  <p class="search-hint">Les résultats proviennent de la base clients e-Hôtels.</p>
+                  <ul class="client-results" id="clientResults" role="listbox"></ul>
+                </div>
+                <div class="client-card" id="clientCard">
+                  <div class="client-ph" aria-hidden="true"></div>
+                  <div class="client-card-body">
+                    <div class="client-card-name" id="cardName">—</div>
+                    <div class="client-card-meta" id="cardEmail">—</div>
+                    <div class="client-card-meta" id="cardId">—</div>
+                  </div>
+                  <button type="button" class="link-edit" id="btnEditClient">Modifier</button>
+                </div>
+                <button type="button" class="btn-dashed" disabled title="Fonction non disponible dans cette version">
+                  + Nouveau profil client
+                </button>
+              </div>
+
+              <div class="section">
+                <h2 class="section-title"><span class="section-num">2</span> DATES DE SÉJOUR</h2>
+                <div class="dates-row">
+                  <div class="field">
+                    <label for="date_debut">ARRIVÉE (CHECK-IN)</label>
+                    <input id="date_debut" name="date_debut" type="date" required />
+                  </div>
+                  <div class="field">
+                    <label for="date_fin">DÉPART (CHECK-OUT)</label>
+                    <input id="date_fin" name="date_fin" type="date" required />
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="rooms-head">
+                  <h2 class="section-title" style="margin: 0"><span class="section-num">3</span> CHAMBRES DISPONIBLES</h2>
+                  <span class="rooms-count" id="roomsCount">—</span>
+                </div>
+                <div id="roomsGrid" class="room-grid"></div>
+                <p class="rooms-placeholder" id="roomsHint">Indiquez les dates pour afficher les chambres libres dans votre hôtel.</p>
+              </div>
+            </div>
+
+            <aside class="summary-panel" aria-label="Résumé">
+              <h2>RÉSUMÉ DE LA LOCATION</h2>
+              <div class="sum-line">
+                <span>Client</span>
+                <span id="sumClient">—</span>
+              </div>
+              <div class="sum-line">
+                <span>Séjour</span>
+                <span id="sumStay">—</span>
+              </div>
+              <div class="sum-line">
+                <span>Chambre</span>
+                <span id="sumRoom">—</span>
+              </div>
+              <div class="sum-total">
+                <div class="sum-total-label">TOTAL</div>
+                <div class="sum-total-val" id="sumTotal">—</div>
+              </div>
+              <div class="emp-block">
+                <h3>EMPLOYÉ RESPONSABLE</h3>
+                <div id="empRadios"></div>
+              </div>
+              <button type="button" class="btn-submit" id="btnSubmit" disabled>Valider la location</button>
+              <div class="note-box">
+                La validation crée une entrée dans les locations. Vérifiez les dates et la chambre avant d’enregistrer.
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const LS_ID = "ehotels.userId";
+      const LS_ROLE = "ehotels.role";
+      const LS_HOTEL = "ehotels.hotelId";
+      const LS_NAME = "ehotels.nom";
+
+      let selectedClient = null;
+      let selectedRoom = null;
+      let employesList = [];
+      let searchTimer = null;
+
+      function normalizeRole(r) {
+        return String(r || "").trim().toLowerCase();
+      }
+
+      function mustBeLoggedIn() {
+        const id = localStorage.getItem(LS_ID);
+        const role = normalizeRole(localStorage.getItem(LS_ROLE));
+        const hotelId = localStorage.getItem(LS_HOTEL);
+        if (!id || !role) window.location.href = "/login.html";
+        if (role === "client") window.location.href = "/client-recherche.html";
+        if (role === "gestionnaire" || role === "manager") window.location.href = "/manager-dashboard.html";
+        if (!hotelId) {
+          setMsg("err", "Votre session ne contient pas l’ID de l’hôtel. Reconnectez-vous.");
+        }
+        return { id, role, hotelId };
+      }
+
+      function setMsg(kind, text) {
+        const el = document.getElementById("msg");
+        el.className = "msg show" + (kind === "err" ? " err" : kind === "ok" ? " ok" : "");
+        el.textContent = text;
+      }
+
+      function clearMsg() {
+        const el = document.getElementById("msg");
+        el.className = "msg";
+        el.textContent = "";
+      }
+
+      function pickField(r, keys) {
+        for (const k of keys) {
+          if (r && r[k] != null && String(r[k]).trim() !== "") return r[k];
+        }
+        return "";
+      }
+
+      function parseDateOnly(x) {
+        if (!x) return null;
+        const d = new Date(x);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      function nightsBetween(d1, d2) {
+        const a = parseDateOnly(d1);
+        const b = parseDateOnly(d2);
+        if (!a || !b) return 0;
+        const n = Math.ceil((b.getTime() - a.getTime()) / 86400000);
+        return Math.max(0, n);
+      }
+
+      function formatMoney(n) {
+        return n.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " €";
+      }
+
+      function shortName(full) {
+        const p = String(full || "").trim().split(/\s+/);
+        if (p.length < 2) return full || "—";
+        return p[0].charAt(0).toUpperCase() + ". " + p[p.length - 1];
+      }
+
+      function updateSummary() {
+        const d1 = document.getElementById("date_debut").value;
+        const d2 = document.getElementById("date_fin").value;
+        const n = nightsBetween(d1, d2);
+
+        document.getElementById("sumClient").textContent = selectedClient
+          ? shortName(pickField(selectedClient, ["nom", "NOM"]))
+          : "—";
+        document.getElementById("sumStay").textContent =
+          d1 && d2 && n > 0 ? n + " nuit" + (n > 1 ? "s" : "") : "—";
+        const rid = selectedRoom ? pickField(selectedRoom, ["id_chambre", "ID_CHAMBRE"]) : "";
+        document.getElementById("sumRoom").textContent = rid ? "#" + rid : "—";
+
+        let total = "—";
+        if (selectedRoom && n > 0) {
+          const prix = parseFloat(String(pickField(selectedRoom, ["prix", "PRIX"])).replace(",", "."));
+          if (Number.isFinite(prix)) total = formatMoney(Math.round(prix * n));
+        }
+        document.getElementById("sumTotal").textContent = total;
+
+        const ok =
+          selectedClient &&
+          selectedRoom &&
+          d1 &&
+          d2 &&
+          n > 0 &&
+          new Date(d2) >= new Date(d1) &&
+          document.querySelector('input[name="id_employe"]:checked');
+        document.getElementById("btnSubmit").disabled = !ok;
+      }
+
+      function renderClientResults(rows) {
+        const ul = document.getElementById("clientResults");
+        ul.innerHTML = "";
+        rows.forEach((row) => {
+          const id = pickField(row, ["id_client", "ID_CLIENT"]);
+          const nom = pickField(row, ["nom", "NOM"]);
+          const email = pickField(row, ["email", "EMAIL"]);
+          const li = document.createElement("li");
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = nom + (email ? " · " + email : "") + (id ? " · #" + id : "");
+          btn.addEventListener("click", () => {
+            selectedClient = row;
+            ul.classList.remove("open");
+            document.getElementById("clientSearch").value = nom;
+            document.getElementById("cardName").textContent = nom || "—";
+            document.getElementById("cardEmail").textContent = email || "Email non renseigné";
+            document.getElementById("cardId").textContent = id ? "Client n° " + id : "";
+            document.getElementById("clientCard").classList.add("visible");
+            clearMsg();
+            updateSummary();
+          });
+          li.appendChild(btn);
+          ul.appendChild(li);
+        });
+        ul.classList.toggle("open", rows.length > 0);
+      }
+
+      async function searchClients(q) {
+        try {
+          const url = "/clients" + (q ? "?q=" + encodeURIComponent(q) : "");
+          const res = await fetch(url);
+          const data = await res.json();
+          if (!res.ok) return;
+          const rows = Array.isArray(data) ? data : [];
+          renderClientResults(q.trim().length >= 1 ? rows : rows.slice(0, 15));
+        } catch {
+          /* ignore */
+        }
+      }
+
+      function clearClientSelection() {
+        selectedClient = null;
+        document.getElementById("clientSearch").value = "";
+        document.getElementById("clientCard").classList.remove("visible");
+        document.getElementById("clientResults").classList.remove("open");
+        document.getElementById("clientResults").innerHTML = "";
+        updateSummary();
+      }
+
+      async function loadRooms() {
+        const { hotelId } = mustBeLoggedIn();
+        if (!hotelId) return;
+        const d1 = document.getElementById("date_debut").value;
+        const d2 = document.getElementById("date_fin").value;
+        const grid = document.getElementById("roomsGrid");
+        const hint = document.getElementById("roomsHint");
+        const countEl = document.getElementById("roomsCount");
+
+        selectedRoom = null;
+        grid.innerHTML = "";
+
+        if (!d1 || !d2 || new Date(d2) < new Date(d1)) {
+          countEl.textContent = "—";
+          hint.style.display = "block";
+          hint.textContent = "Indiquez des dates valides pour charger les chambres.";
+          updateSummary();
+          return;
+        }
+
+        hint.style.display = "none";
+        countEl.textContent = "Chargement…";
+
+        try {
+          const url =
+            "/chambres/disponibles-hotel/" +
+            encodeURIComponent(hotelId) +
+            "?date_debut=" +
+            encodeURIComponent(d1) +
+            "&date_fin=" +
+            encodeURIComponent(d2);
+          const res = await fetch(url);
+          const data = await res.json();
+          if (!res.ok) {
+            countEl.textContent = "—";
+            hint.style.display = "block";
+            hint.textContent = (data && data.message) || data.error || "Impossible de charger les chambres.";
+            updateSummary();
+            return;
+          }
+          const rooms = Array.isArray(data) ? data : [];
+          const n = rooms.length;
+          countEl.textContent = n + " chambre" + (n > 1 ? "s" : "") + " libre" + (n > 1 ? "s" : "");
+
+          if (!n) {
+            hint.style.display = "block";
+            hint.textContent = "Aucune chambre libre sur cette période pour votre hôtel.";
+            updateSummary();
+            return;
+          }
+
+          rooms.forEach((room) => {
+            const idCh = pickField(room, ["id_chambre", "ID_CHAMBRE"]);
+            const vue = pickField(room, ["vue", "VUE"]);
+            const prix = pickField(room, ["prix", "PRIX"]);
+            const cap = pickField(room, ["capacite", "CAPACITE"]);
+            const typeLine = cap ? "Capacité " + cap : "Chambre";
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "room-card";
+            btn.dataset.id = idCh;
+            btn.innerHTML =
+              '<span class="check" aria-hidden="true">✓</span>' +
+              '<div class="room-num">CHAMBRE ' +
+              (idCh || "—") +
+              "</div>" +
+              '<div class="room-type">' +
+              typeLine +
+              "</div>" +
+              '<div class="room-vue">' +
+              (vue ? String(vue) : "—") +
+              "</div>" +
+              '<div class="room-price">' +
+              (prix != null ? prix + " € / nuit" : "—") +
+              "</div>";
+            btn.addEventListener("click", () => {
+              grid.querySelectorAll(".room-card").forEach((c) => c.classList.remove("selected"));
+              btn.classList.add("selected");
+              selectedRoom = room;
+              updateSummary();
+            });
+            grid.appendChild(btn);
+          });
+          updateSummary();
+        } catch {
+          countEl.textContent = "—";
+          hint.style.display = "block";
+          hint.textContent = "Erreur réseau.";
+          updateSummary();
+        }
+      }
+
+      function renderEmployes() {
+        const wrap = document.getElementById("empRadios");
+        const myId = parseInt(String(localStorage.getItem(LS_ID)), 10);
+        wrap.innerHTML = "";
+        if (!employesList.length) {
+          wrap.innerHTML = "<p style='font-size:0.85rem;color:var(--muted)'>Aucun employé listé.</p>";
+          updateSummary();
+          return;
+        }
+        employesList.forEach((emp) => {
+          const eid = parseInt(String(pickField(emp, ["id_employe", "ID_EMPLOYE"])), 10);
+          const nom = pickField(emp, ["nom", "NOM"]);
+          const label = document.createElement("label");
+          label.className = "emp-opt";
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = "id_employe";
+          input.value = String(eid);
+          const isMe = Number.isFinite(myId) && Number.isFinite(eid) && eid === myId;
+          input.addEventListener("change", updateSummary);
+          label.appendChild(input);
+          const span = document.createElement("span");
+          span.textContent = nom + (isMe ? " (Vous)" : "");
+          label.appendChild(span);
+          wrap.appendChild(label);
+        });
+        const first = wrap.querySelector('input[name="id_employe"]');
+        const mine =
+          Number.isFinite(myId) && wrap.querySelector('input[name="id_employe"][value="' + myId + '"]');
+        if (mine) mine.checked = true;
+        else if (first) first.checked = true;
+        updateSummary();
+      }
+
+      async function initEmployes(hotelId) {
+        if (!hotelId) return;
+        try {
+          const res = await fetch("/employes/" + encodeURIComponent(hotelId));
+          const data = await res.json();
+          employesList = Array.isArray(data) ? data : [];
+          renderEmployes();
+        } catch {
+          employesList = [];
+          renderEmployes();
+        }
+      }
+
+      (function init() {
+        const { hotelId } = mustBeLoggedIn();
+        document.getElementById("sidebarHotel").textContent = hotelId ? "Réf. hôtel #" + hotelId : "—";
+        const nom = localStorage.getItem(LS_NAME);
+        document.getElementById("headerUserName").textContent = nom ? String(nom).toUpperCase() : "EMPLOYÉ";
+
+        if (hotelId) initEmployes(hotelId);
+        else renderEmployes();
+
+        document.getElementById("btnLogout").addEventListener("click", (e) => {
+          e.preventDefault();
+          localStorage.removeItem(LS_ID);
+          localStorage.removeItem(LS_ROLE);
+          localStorage.removeItem(LS_HOTEL);
+          localStorage.removeItem(LS_NAME);
+          window.location.href = "/login.html";
+        });
+
+        document.getElementById("btnMenu")?.addEventListener("click", () => document.body.classList.toggle("nav-open"));
+
+        document.getElementById("clientSearch").addEventListener("input", (e) => {
+          const q = e.target.value.trim();
+          clearTimeout(searchTimer);
+          if (q.length < 1) {
+            document.getElementById("clientResults").classList.remove("open");
+            document.getElementById("clientResults").innerHTML = "";
+            return;
+          }
+          searchTimer = setTimeout(() => searchClients(q), 280);
+        });
+
+        document.getElementById("clientSearch").addEventListener("focus", () => {
+          const q = document.getElementById("clientSearch").value.trim();
+          if (q.length >= 1) searchClients(q);
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest(".search-wrap")) {
+            document.getElementById("clientResults").classList.remove("open");
+          }
+        });
+
+        document.getElementById("btnEditClient").addEventListener("click", clearClientSelection);
+
+        ["date_debut", "date_fin"].forEach((id) => {
+          document.getElementById(id).addEventListener("change", () => {
+            loadRooms();
+            updateSummary();
+          });
+        });
+
+        document.getElementById("btnSubmit").addEventListener("click", async () => {
+          const id_client = parseInt(
+            String(pickField(selectedClient, ["id_client", "ID_CLIENT"])),
+            10
+          );
+          const id_chambre = parseInt(
+            String(pickField(selectedRoom, ["id_chambre", "ID_CHAMBRE"])),
+            10
+          );
+          const date_debut = document.getElementById("date_debut").value;
+          const date_fin = document.getElementById("date_fin").value;
+          const empEl = document.querySelector('input[name="id_employe"]:checked');
+          const id_employe = empEl ? parseInt(empEl.value, 10) : NaN;
+
+          if (!Number.isFinite(id_client) || !Number.isFinite(id_chambre) || !Number.isFinite(id_employe)) {
+            setMsg("err", "Sélectionnez un client, une chambre et un employé responsable.");
+            return;
+          }
+
+          const btn = document.getElementById("btnSubmit");
+          btn.disabled = true;
+          try {
+            const res = await fetch("/locations", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id_client, id_chambre, id_employe, date_debut, date_fin }),
+            });
+            const t = await res.text();
+            let d = null;
+            try {
+              d = t ? JSON.parse(t) : null;
+            } catch {
+              d = null;
+            }
+            if (!res.ok) {
+              setMsg("err", (d && (d.error || d.message)) || "Création impossible.");
+              btn.disabled = false;
+              return;
+            }
+            setMsg("ok", "Location créée avec succès.");
+            clearClientSelection();
+            selectedRoom = null;
+            document.getElementById("date_debut").value = "";
+            document.getElementById("date_fin").value = "";
+            document.getElementById("roomsGrid").innerHTML = "";
+            document.getElementById("roomsHint").style.display = "block";
+            document.getElementById("roomsHint").textContent =
+              "Indiquez les dates pour afficher les chambres libres dans votre hôtel.";
+            document.getElementById("roomsCount").textContent = "—";
+            updateSummary();
+            btn.disabled = false;
+          } catch {
+            setMsg("err", "Erreur réseau : veuillez réessayer.");
+            btn.disabled = false;
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestion des chambres — e-Hôtels</title>
+    <style>
+      :root {
+        --blue: #0d7bc4;
+        --blue-soft: rgba(13, 123, 196, 0.14);
+        --ink: #1a1a1a;
+        --muted: #6b6b6b;
+        --line: #e8eaed;
+        --paper: #f6f7f9;
+        --card: #fff;
+        --sans: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+        --serif: Georgia, "Times New Roman", ui-serif, serif;
+        --sidebar: 268px;
+        --max: 1200px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.9375rem;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: var(--sidebar) 1fr;
+        min-height: 100vh;
+      }
+      aside {
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 1.5rem 1.1rem;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+      }
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        text-decoration: none;
+        color: var(--ink);
+      }
+      .logo-diamond {
+        width: 10px;
+        height: 10px;
+        background: var(--blue);
+        transform: rotate(45deg);
+      }
+      .logo-text {
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        color: var(--blue);
+      }
+      .nav-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        margin-bottom: 0.65rem;
+        font-weight: 600;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.65rem 0.75rem;
+        border-radius: 8px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.2rem;
+      }
+      .nav-item:hover {
+        background: var(--paper);
+        color: var(--ink);
+      }
+      .nav-item.active {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      .nav-item.active svg {
+        stroke: var(--blue);
+      }
+      .sidebar-hotel {
+        margin-top: auto;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+      .sidebar-hotel strong {
+        display: block;
+        color: var(--ink);
+        font-size: 0.75rem;
+        margin-top: 0.35rem;
+        line-height: 1.35;
+        font-weight: 600;
+      }
+      .main-col {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .top-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.85rem 1.5rem;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
+        color: var(--blue);
+      }
+      .user-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .user-name {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .avatar {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #d0e8f7, #a8d4ef);
+        border: 1px solid var(--line);
+      }
+      .btn-icon {
+        border: 1px solid var(--line);
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+      }
+      .btn-icon:hover {
+        color: var(--blue);
+      }
+      main {
+        max-width: var(--max);
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1.5rem 2.5rem;
+      }
+      .page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(1.65rem, 3vw, 2.15rem);
+        font-weight: 500;
+        letter-spacing: 0.02em;
+      }
+      .page-sub {
+        margin: 0.5rem 0 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+        max-width: 36rem;
+        line-height: 1.45;
+      }
+      .head-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .btn-ghost {
+        border: 1px solid var(--line);
+        background: var(--card);
+        padding: 0.5rem 0.95rem;
+        border-radius: 8px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .btn-ghost:hover {
+        border-color: #d0d8e0;
+      }
+      .btn-primary {
+        border: none;
+        background: var(--blue);
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn-primary:hover {
+        filter: brightness(0.95);
+      }
+      .filter-bar {
+        display: none;
+        margin-bottom: 1rem;
+      }
+      .filter-bar.open {
+        display: block;
+      }
+      .filter-bar input {
+        width: 100%;
+        max-width: 320px;
+        padding: 0.6rem 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: inherit;
+      }
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+      }
+      .table-scroll {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.85rem 1.1rem;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        border-bottom: 1px solid var(--line);
+        background: #fafbfc;
+        white-space: nowrap;
+      }
+      th.sortable {
+        cursor: pointer;
+        user-select: none;
+      }
+      th.sortable:hover {
+        color: var(--blue);
+      }
+      td {
+        padding: 1rem 1.1rem;
+        border-bottom: 1px solid var(--line);
+        vertical-align: middle;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .num {
+        font-weight: 700;
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      .badge-clean {
+        background: #ecf8f0;
+        color: #1a6b3e;
+        border: 1px solid #c5e8d4;
+      }
+      .badge-maint {
+        background: #f0f0f2;
+        color: #555;
+        border: 1px solid #ddd;
+      }
+      .badge-dirty {
+        background: #fdf2f2;
+        color: #a82a2a;
+        border: 1px solid #f0c4c4;
+      }
+      .badge-neutral {
+        background: #f5f6f8;
+        color: #555;
+        border: 1px solid var(--line);
+      }
+      .tarif {
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .actions {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+      .actions button {
+        border: none;
+        background: none;
+        color: var(--blue);
+        font-size: 0.72rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        text-decoration: underline;
+        padding: 0;
+      }
+      .actions button.danger {
+        color: #b53535;
+      }
+      .table-footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem 1.1rem;
+        border-top: 1px solid var(--line);
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .pager {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .pager button {
+        border: 1px solid var(--line);
+        background: #fff;
+        padding: 0.35rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.62rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .pager button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .pager .pages {
+        display: flex;
+        gap: 0.25rem;
+      }
+      .pager .pages button.page-on {
+        background: var(--blue-soft);
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      @media (max-width: 900px) {
+        .kpi-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .kpi-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.15rem 1.25rem;
+      }
+      .kpi-card .lbl {
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .kpi-card .val {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-top: 0.35rem;
+        letter-spacing: -0.02em;
+      }
+      .kpi-card .sub {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 0.45rem;
+        line-height: 1.4;
+      }
+      .site-footer {
+        margin-top: 1rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.65rem;
+        color: #999;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .site-footer a {
+        color: #999;
+        text-decoration: none;
+        margin-left: 1rem;
+      }
+      .site-footer a:hover {
+        color: var(--blue);
+      }
+      .msg {
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: none;
+        font-size: 0.88rem;
+      }
+      .msg.show {
+        display: block;
+      }
+      .msg.err {
+        background: #fff8f8;
+        border: 1px solid #f0c4c4;
+        color: #8b2e2e;
+      }
+      .msg.ok {
+        background: #f0faf4;
+        border: 1px solid #c4e6d0;
+        color: #1e5c2e;
+      }
+      .modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .modal-backdrop.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--card);
+        border-radius: 12px;
+        max-width: 480px;
+        width: 100%;
+        max-height: 90vh;
+        overflow: auto;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
+      }
+      .modal-head {
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid var(--line);
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .modal-body {
+        padding: 1.25rem;
+      }
+      .modal-body label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+        margin-top: 0.75rem;
+      }
+      .modal-body label:first-of-type {
+        margin-top: 0;
+      }
+      .modal-body input,
+      .modal-body select,
+      .modal-body textarea {
+        width: 100%;
+        padding: 0.55rem 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.9rem;
+      }
+      .modal-body textarea {
+        min-height: 4rem;
+        resize: vertical;
+      }
+      .modal-foot {
+        padding: 1rem 1.25rem;
+        border-top: 1px solid var(--line);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+      }
+      .topbar {
+        display: none;
+      }
+      .toggle {
+        display: none;
+      }
+      @media (max-width: 940px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: min(300px, 88vw);
+          transform: translateX(-105%);
+          transition: transform 0.25s ease;
+          z-index: 40;
+          box-shadow: 8px 0 32px rgba(0, 0, 0, 0.1);
+          height: 100vh;
+        }
+        body.nav-open aside {
+          transform: translateX(0);
+        }
+        .topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: var(--card);
+          border-bottom: 1px solid var(--line);
+        }
+        .toggle {
+          display: inline-flex;
+          width: 2.75rem;
+          height: 2.5rem;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: #fff;
+          cursor: pointer;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside aria-label="Navigation gestionnaire">
+        <a class="logo-row" href="/manager-dashboard.html">
+          <span class="logo-diamond" aria-hidden="true"></span>
+          <span class="logo-text">E-HÔTELS</span>
+        </a>
+        <div class="nav-label">MENU</div>
+        <nav>
+          <a class="nav-item" href="/manager-dashboard.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="9" />
+              <rect x="14" y="3" width="7" height="5" />
+              <rect x="14" y="12" width="7" height="9" />
+              <rect x="3" y="16" width="7" height="5" />
+            </svg>
+            Tableau de bord
+          </a>
+          <a class="nav-item" href="/admin-employes.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Employés
+          </a>
+          <a class="nav-item active" href="/admin-chambres.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M2 20h20M4 20V10l8-6 8 6v10" />
+              <path d="M9 20v-6h6v6" />
+            </svg>
+            Chambres
+          </a>
+          <a class="nav-item" href="/admin-clients.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Clients
+          </a>
+        </nav>
+        <div class="sidebar-hotel">
+          HÔTEL ACTUEL
+          <strong id="sidebarHotel">—</strong>
+        </div>
+      </aside>
+
+      <div class="main-col">
+        <div class="topbar">
+          <button class="toggle" type="button" id="btnMenu" aria-label="Menu">☰</button>
+          <span class="brand">E-HÔTELS</span>
+          <span style="width: 2.75rem"></span>
+        </div>
+        <header class="top-header">
+          <span class="brand">E-HÔTELS</span>
+          <div class="user-row">
+            <span class="user-name" id="headerUser">GESTIONNAIRE</span>
+            <span class="avatar" aria-hidden="true"></span>
+            <button type="button" class="btn-icon" id="btnLogout" title="Déconnexion" aria-label="Déconnexion">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <main>
+          <div class="msg" id="msg"></div>
+
+          <div class="page-head">
+            <div>
+              <h1>Gestion des chambres</h1>
+              <p class="page-sub">
+                Supervisez et mettez à jour l’inventaire de votre établissement en temps réel (données issues de la base).
+              </p>
+            </div>
+            <div class="head-actions">
+              <button type="button" class="btn-ghost" id="btnToggleFilter">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                FILTRER
+              </button>
+              <button type="button" class="btn-primary" id="btnAdd">+ Ajouter une chambre</button>
+            </div>
+          </div>
+
+          <div class="filter-bar" id="filterBar">
+            <input type="search" id="filterInput" placeholder="Filtrer par n°, vue, état, commodités…" autocomplete="off" />
+          </div>
+
+          <div class="panel">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="sortable" id="thSort" title="Trier">NUMÉRO ⇅</th>
+                    <th>CATÉGORIE</th>
+                    <th>LOCALISATION</th>
+                    <th>ÉTAT</th>
+                    <th>TARIF NUITEE</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span id="tableHint">—</span>
+              <div class="pager" id="pager"></div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="lbl">TAUX D'OCCUPATION</div>
+              <div class="val" id="kpiOcc">—</div>
+              <div class="sub" id="kpiOccSub">Indicateur à la date du jour pour votre hôtel.</div>
+            </div>
+            <div class="kpi-card">
+              <div class="lbl">ALERTES MAINTENANCE</div>
+              <div class="val" id="kpiMaint">—</div>
+              <div class="sub" id="kpiMaintSub">Chambres dont l’état contient « maintenance ».</div>
+            </div>
+            <div class="kpi-card">
+              <div class="lbl">PRÊTES POUR CHECK-IN</div>
+              <div class="val" id="kpiReady">—</div>
+              <div class="sub" id="kpiReadySub">Chambres au statut disponible.</div>
+            </div>
+          </div>
+
+          <footer class="site-footer">
+            <span>© 2026 E-HÔTELS EXCELLENCE GROUP</span>
+            <span>
+              <a href="#">Privacy</a>
+              <a href="#">Terms</a>
+              <a href="#">Concierge</a>
+            </span>
+          </footer>
+        </main>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal">
+        <div class="modal-head" id="modalTitle">Chambre</div>
+        <form id="modalForm" class="modal-body">
+          <input type="hidden" id="f_id_chambre" value="" />
+          <label for="f_vue">Vue / type (affiché comme catégorie)</label>
+          <input id="f_vue" required />
+          <label for="f_capacite">Capacité</label>
+          <input id="f_capacite" required />
+          <label for="f_superficie">Superficie (m²)</label>
+          <input id="f_superficie" type="number" min="1" step="1" required />
+          <label for="f_prix">Tarif nuitée (€)</label>
+          <input id="f_prix" type="number" min="0" step="0.01" required />
+          <label for="f_commodites">Commodités</label>
+          <textarea id="f_commodites"></textarea>
+          <label for="f_ajouter_lit">Lit supplémentaire</label>
+          <input id="f_ajouter_lit" placeholder="oui / non ou détail" />
+          <label for="f_etat">État</label>
+          <select id="f_etat">
+            <option value="disponible">disponible (affiché « Propre »)</option>
+            <option value="maintenance">maintenance</option>
+            <option value="nettoyage">nettoyage (affiché « À nettoyer »)</option>
+          </select>
+        </form>
+        <div class="modal-foot">
+          <button type="button" class="btn-ghost" id="modalCancel">Annuler</button>
+          <button type="submit" form="modalForm" class="btn-primary" id="modalSave">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const LS_ID = "ehotels.userId";
+      const LS_ROLE = "ehotels.role";
+      const LS_HOTEL = "ehotels.hotelId";
+      const LS_NAME = "ehotels.nom";
+
+      const PAGE_SIZE = 7;
+      let hotelId = "";
+      let allRows = [];
+      let dash = null;
+      let sortDesc = false;
+      let filterText = "";
+      let page = 1;
+
+      function normalizeRole(r) {
+        return String(r || "").trim().toLowerCase();
+      }
+
+      function gate() {
+        const role = normalizeRole(localStorage.getItem(LS_ROLE));
+        if (role !== "gestionnaire" && role !== "manager") {
+          window.location.href =
+            role === "client" ? "/client-recherche.html" : "/employe-reservations.html";
+          return false;
+        }
+        if (!localStorage.getItem(LS_ID)) {
+          window.location.href = "/login.html";
+          return false;
+        }
+        hotelId = localStorage.getItem(LS_HOTEL) || "";
+        if (!hotelId) {
+          setMsg("err", "Aucun hôtel associé à la session. Reconnectez-vous.");
+          return false;
+        }
+        return true;
+      }
+
+      function pick(r, keys) {
+        for (const k of keys) {
+          if (r && r[k] != null && String(r[k]).trim() !== "") return r[k];
+        }
+        return "";
+      }
+
+      function setMsg(kind, text) {
+        const el = document.getElementById("msg");
+        el.className = "msg show" + (kind === "err" ? " err" : kind === "ok" ? " ok" : "");
+        el.textContent = text || "";
+        if (!text) el.classList.remove("show");
+      }
+
+      function clearMsg() {
+        const el = document.getElementById("msg");
+        el.className = "msg";
+        el.textContent = "";
+      }
+
+      function badgeEtat(raw) {
+        const e = String(raw || "")
+          .toLowerCase()
+          .trim();
+        if (e === "disponible" || e === "propre" || e === "libre") {
+          return { label: "Propre", cls: "badge-clean" };
+        }
+        if (e.includes("maintenance") || e === "réparation" || e === "reparation") {
+          return { label: "Maintenance", cls: "badge-maint" };
+        }
+        if (e.includes("nettoy") || e === "sale" || e === "nettoyage") {
+          return { label: "À nettoyer", cls: "badge-dirty" };
+        }
+        if (!e) return { label: "—", cls: "badge-neutral" };
+        return { label: String(raw), cls: "badge-neutral" };
+      }
+
+      function localisation(r) {
+        const sup = pick(r, ["superficie", "SUPERFICIE"]);
+        const cap = pick(r, ["capacite", "CAPACITE"]);
+        const parts = [];
+        if (sup !== "" && sup != null) parts.push(sup + " m²");
+        if (cap !== "") parts.push("Cap. " + cap);
+        return parts.length ? parts.join(" · ") : "—";
+      }
+
+      function filteredSorted() {
+        let rows = allRows.slice();
+        const q = filterText.toLowerCase().trim();
+        if (q) {
+          rows = rows.filter((r) => {
+            const s = JSON.stringify(r).toLowerCase();
+            return s.includes(q);
+          });
+        }
+        rows.sort((a, b) => {
+          const ida = parseInt(String(pick(a, ["id_chambre", "ID_CHAMBRE"])), 10) || 0;
+          const idb = parseInt(String(pick(b, ["id_chambre", "ID_CHAMBRE"])), 10) || 0;
+          return sortDesc ? idb - ida : ida - idb;
+        });
+        return rows;
+      }
+
+      function render() {
+        const rows = filteredSorted();
+        const total = rows.length;
+        const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        if (page > pages) page = pages;
+        const start = (page - 1) * PAGE_SIZE;
+        const slice = rows.slice(start, start + PAGE_SIZE);
+
+        const tbody = document.getElementById("tbody");
+        tbody.innerHTML = "";
+        slice.forEach((r) => {
+          const id = pick(r, ["id_chambre", "ID_CHAMBRE"]);
+          const vue = pick(r, ["vue", "VUE"]);
+          const prix = pick(r, ["prix", "PRIX"]);
+          const etatRaw = pick(r, ["etat", "ETAT"]);
+          const b = badgeEtat(etatRaw);
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td class='num'>#" +
+            id +
+            "</td>" +
+            "<td></td>" +
+            "<td></td>" +
+            "<td><span class='badge " +
+            b.cls +
+            "'></span></td>" +
+            "<td class='tarif'></td>" +
+            "<td class='actions'></td>";
+          tr.cells[1].textContent = vue || "—";
+          tr.cells[2].textContent = localisation(r);
+          tr.querySelector(".badge").textContent = b.label;
+          const p = parseFloat(String(prix).replace(",", "."));
+          tr.cells[4].textContent = Number.isFinite(p)
+            ? p.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €"
+            : "—";
+
+          const edit = document.createElement("button");
+          edit.type = "button";
+          edit.textContent = "Modifier";
+          edit.addEventListener("click", () => openModal(r));
+
+          const del = document.createElement("button");
+          del.type = "button";
+          del.className = "danger";
+          del.textContent = "Supprimer";
+          del.addEventListener("click", () => removeRoom(id));
+
+          tr.cells[5].appendChild(edit);
+          tr.cells[5].appendChild(document.createTextNode(" "));
+          tr.cells[5].appendChild(del);
+          tbody.appendChild(tr);
+        });
+
+        if (!slice.length) {
+          tbody.innerHTML =
+            "<tr><td colspan='6' style='text-align:center;padding:2rem;color:var(--muted)'>Aucune chambre à afficher.</td></tr>";
+        }
+
+        document.getElementById("tableHint").textContent =
+          total === 0
+            ? "AFFICHAGE DE 0 CHAMBRE"
+            : "AFFICHAGE DE " +
+              slice.length +
+              " SUR " +
+              total +
+              " CHAMBRE" +
+              (total > 1 ? "S" : "");
+
+        const pager = document.getElementById("pager");
+        pager.innerHTML = "";
+        if (pages <= 1) {
+          const prev = document.createElement("button");
+          prev.textContent = "Précédent";
+          prev.disabled = true;
+          const next = document.createElement("button");
+          next.textContent = "Suivant";
+          next.disabled = true;
+          pager.appendChild(prev);
+          pager.appendChild(next);
+          return;
+        }
+
+        const prev = document.createElement("button");
+        prev.textContent = "Précédent";
+        prev.disabled = page <= 1;
+        prev.addEventListener("click", () => {
+          page--;
+          render();
+        });
+        const pagesWrap = document.createElement("div");
+        pagesWrap.className = "pages";
+        for (let i = 1; i <= pages; i++) {
+          const b = document.createElement("button");
+          b.textContent = String(i);
+          if (i === page) b.classList.add("page-on");
+          b.addEventListener("click", () => {
+            page = i;
+            render();
+          });
+          pagesWrap.appendChild(b);
+        }
+        const next = document.createElement("button");
+        next.textContent = "Suivant";
+        next.disabled = page >= pages;
+        next.addEventListener("click", () => {
+          page++;
+          render();
+        });
+        pager.appendChild(prev);
+        pager.appendChild(pagesWrap);
+        pager.appendChild(next);
+      }
+
+      async function removeRoom(id) {
+        if (!confirm("Supprimer la chambre n° " + id + " ?")) return;
+        try {
+          const res = await fetch("/chambres/" + encodeURIComponent(id), { method: "DELETE" });
+          const t = await res.text();
+          let d = null;
+          try {
+            d = t ? JSON.parse(t) : null;
+          } catch {
+            d = null;
+          }
+          if (!res.ok) {
+            setMsg("err", (d && (d.error || d.message)) || "Suppression impossible.");
+            return;
+          }
+          setMsg("ok", "Chambre supprimée.");
+          await loadAll();
+        } catch {
+          setMsg("err", "Erreur réseau.");
+        }
+      }
+
+      function openModal(row) {
+        const isEdit = !!row;
+        document.getElementById("modalTitle").textContent = isEdit ? "Modifier la chambre" : "Nouvelle chambre";
+        document.getElementById("f_id_chambre").value = isEdit ? pick(row, ["id_chambre", "ID_CHAMBRE"]) : "";
+        document.getElementById("f_vue").value = isEdit ? pick(row, ["vue", "VUE"]) : "";
+        document.getElementById("f_capacite").value = isEdit ? pick(row, ["capacite", "CAPACITE"]) : "";
+        document.getElementById("f_superficie").value = isEdit ? pick(row, ["superficie", "SUPERFICIE"]) : "";
+        document.getElementById("f_prix").value = isEdit ? pick(row, ["prix", "PRIX"]) : "";
+        document.getElementById("f_commodites").value = isEdit ? pick(row, ["commodites", "COMMODITES"]) : "";
+        document.getElementById("f_ajouter_lit").value = isEdit ? pick(row, ["ajouter_lit", "AJOUTER_LIT"]) : "";
+        const et = String(isEdit ? pick(row, ["etat", "ETAT"]) : "disponible").toLowerCase();
+        const sel = document.getElementById("f_etat");
+        let v = "disponible";
+        if (et.includes("maintenance")) v = "maintenance";
+        else if (et.includes("nettoy") || et === "nettoyage" || et === "sale") v = "nettoyage";
+        sel.value = v;
+        document.getElementById("modalBackdrop").classList.add("open");
+      }
+
+      function closeModal() {
+        document.getElementById("modalBackdrop").classList.remove("open");
+      }
+
+      async function loadAll() {
+        if (!gate()) return;
+        clearMsg();
+        document.getElementById("headerUser").textContent = (
+          localStorage.getItem(LS_NAME) || "Gestionnaire"
+        ).toUpperCase();
+
+        try {
+          const [resCh, resDash] = await Promise.all([
+            fetch("/chambres/" + encodeURIComponent(hotelId)),
+            fetch("/manager/hotel/" + encodeURIComponent(hotelId) + "/dashboard"),
+          ]);
+          const chData = await resCh.json();
+          if (!resCh.ok) throw new Error(chData.error || chData.message || "Chambres");
+          allRows = Array.isArray(chData) ? chData : [];
+
+          dash = null;
+          if (resDash.ok) {
+            dash = await resDash.json();
+            const h = dash.hotel || {};
+            document.getElementById("sidebarHotel").textContent =
+              (h.nom || "") + (h.adresse ? " — " + h.adresse : "") || "Réf. #" + hotelId;
+            document.getElementById("kpiOcc").textContent =
+              (dash.occupancy_today_pct != null ? dash.occupancy_today_pct : "—") + "%";
+            document.getElementById("kpiReady").textContent = String(dash.chambres_pretes ?? "—");
+          } else {
+            document.getElementById("sidebarHotel").textContent = "Réf. #" + hotelId;
+            document.getElementById("kpiOcc").textContent = "—";
+            document.getElementById("kpiReady").textContent = String(
+              allRows.filter((r) => badgeEtat(pick(r, ["etat", "ETAT"])).label === "Propre").length
+            );
+          }
+
+          let maintCount = 0;
+          allRows.forEach((r) => {
+            if (badgeEtat(pick(r, ["etat", "ETAT"])).label === "Maintenance") maintCount++;
+          });
+          document.getElementById("kpiMaint").textContent = String(maintCount);
+          document.getElementById("kpiMaintSub").textContent =
+            maintCount > 0
+              ? maintCount + " chambre(s) en maintenance (état renseigné en base)."
+              : "Aucune chambre en maintenance pour cet hôtel.";
+
+          page = 1;
+          render();
+        } catch (e) {
+          setMsg("err", e.message || "Chargement impossible.");
+        }
+      }
+
+      document.getElementById("btnToggleFilter").addEventListener("click", () => {
+        document.getElementById("filterBar").classList.toggle("open");
+      });
+      document.getElementById("filterInput").addEventListener("input", (e) => {
+        filterText = e.target.value;
+        page = 1;
+        render();
+      });
+      document.getElementById("thSort").addEventListener("click", () => {
+        sortDesc = !sortDesc;
+        render();
+      });
+
+      document.getElementById("btnAdd").addEventListener("click", () => openModal(null));
+      document.getElementById("modalCancel").addEventListener("click", closeModal);
+      document.getElementById("modalBackdrop").addEventListener("click", (e) => {
+        if (e.target.id === "modalBackdrop") closeModal();
+      });
+
+      document.getElementById("modalForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const idCh = document.getElementById("f_id_chambre").value;
+        const body = {
+          prix: parseFloat(document.getElementById("f_prix").value),
+          vue: document.getElementById("f_vue").value.trim(),
+          capacite: document.getElementById("f_capacite").value.trim(),
+          commodites: document.getElementById("f_commodites").value.trim(),
+          ajouter_lit: document.getElementById("f_ajouter_lit").value.trim(),
+          superficie: parseInt(document.getElementById("f_superficie").value, 10),
+          etat: document.getElementById("f_etat").value,
+        };
+        if (!Number.isFinite(body.prix) || !Number.isFinite(body.superficie)) {
+          setMsg("err", "Prix et superficie doivent être valides.");
+          return;
+        }
+        try {
+          if (idCh) {
+            const res = await fetch("/chambres/" + encodeURIComponent(idCh), {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const t = await res.text();
+            let d = null;
+            try {
+              d = t ? JSON.parse(t) : null;
+            } catch {
+              d = null;
+            }
+            if (!res.ok) throw new Error((d && (d.error || d.message)) || "Mise à jour impossible");
+          } else {
+            const res = await fetch("/chambres", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id_hotel: parseInt(hotelId, 10),
+                prix: body.prix,
+                vue: body.vue,
+                capacite: body.capacite,
+                commodites: body.commodites,
+                ajouter_lit: body.ajouter_lit,
+                superficie: body.superficie,
+              }),
+            });
+            const t = await res.text();
+            let d = null;
+            try {
+              d = t ? JSON.parse(t) : null;
+            } catch {
+              d = null;
+            }
+            if (!res.ok) throw new Error((d && (d.error || d.message)) || "Création impossible");
+            if (d && body.etat && body.etat !== "disponible") {
+              const newId = pick(d, ["id_chambre", "ID_CHAMBRE"]);
+              if (newId) {
+                await fetch("/chambres/" + encodeURIComponent(newId), {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ ...body, etat: body.etat }),
+                });
+              }
+            }
+          }
+          closeModal();
+          setMsg("ok", idCh ? "Chambre mise à jour." : "Chambre créée.");
+          await loadAll();
+        } catch (err) {
+          setMsg("err", err.message || "Erreur.");
+        }
+      });
+
+      document.getElementById("btnLogout").addEventListener("click", () => {
+        localStorage.removeItem(LS_ID);
+        localStorage.removeItem(LS_ROLE);
+        localStorage.removeItem(LS_HOTEL);
+        localStorage.removeItem(LS_NAME);
+        window.location.href = "/login.html";
+      });
+      document.getElementById("btnMenu")?.addEventListener("click", () => document.body.classList.toggle("nav-open"));
+
+      loadAll();
+    </script>
+  </body>
+</html>

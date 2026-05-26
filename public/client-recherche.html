@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recherche — e-Hôtels</title>
+    <style>
+      :root {
+        --paper: #f6f6f6;
+        --ink: #222;
+        --accent: #2f95cc;
+        --accent-soft: rgba(47, 149, 204, 0.13);
+        --line: #e7e7e7;
+        --max: 1220px;
+        --sans: "Segoe UI", Arial, sans-serif;
+        --serif: "Times New Roman", Georgia, serif;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: var(--sans);
+        color: var(--ink);
+        background: #fff;
+      }
+      .top {
+        border-bottom: 1px solid var(--line);
+        background: #fff;
+      }
+      .top-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.8rem 1rem;
+        gap: 1rem;
+      }
+      .logo {
+        font-family: var(--serif);
+        letter-spacing: 0.12em;
+        font-size: 1.05rem;
+        color: #217aa6;
+      }
+      .nav {
+        display: flex;
+        gap: 1.4rem;
+        align-items: center;
+      }
+      .nav a {
+        text-decoration: none;
+        font-size: 0.76rem;
+        color: #6a6a6a;
+      }
+      .nav a.active { color: var(--accent); font-weight: 600; }
+      .right {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 0.68rem;
+        color: #888;
+      }
+      .logout {
+        border: 1px solid var(--line);
+        background: #fff;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.66rem;
+      }
+      .hero-wrap {
+        background: #f5f5f5;
+        border-bottom: 1px solid var(--line);
+      }
+      .hero {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 3.35rem 1rem 2.7rem;
+        text-align: center;
+      }
+      .chip {
+        display: inline-block;
+        padding: 0.3rem 0.9rem;
+        border-radius: 999px;
+        border: 1px solid #d6eaf6;
+        color: var(--accent);
+        font-size: 0.63rem;
+        margin-bottom: 1rem;
+      }
+      h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(2.15rem, 5vw, 3.6rem);
+        font-weight: 500;
+        line-height: 1.03;
+      }
+      .sub {
+        margin: 1.05rem auto 2rem;
+        max-width: 560px;
+        color: #727272;
+        text-transform: uppercase;
+        letter-spacing: 0.11em;
+        font-size: 0.68rem;
+      }
+      .search {
+        max-width: 1220px;
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.065);
+      }
+      .search-advanced {
+        max-width: 1220px;
+        margin: 1.25rem auto 0;
+        background: #fff;
+        border: 1px solid var(--line);
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.07);
+      }
+      .search-main {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr auto;
+      }
+      .field {
+        border-right: 1px solid var(--line);
+        padding: 1.25rem 1.3rem;
+        text-align: left;
+      }
+      .field:last-child { border-right: none; }
+      .fl {
+        color: #9a9a9a;
+        font-size: 0.64rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+      .fv {
+        margin-top: 0.52rem;
+      }
+      input, select {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        font-size: 1.06rem;
+        color: #2b2b2b;
+        outline: none;
+      }
+      .dates {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.35rem;
+      }
+      .go {
+        min-width: 190px;
+        margin: 0.6rem;
+        border: 0;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.78rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        font-weight: 600;
+        min-height: 56px;
+      }
+      .advanced {
+        padding: 1.65rem 1.5rem 1.85rem;
+      }
+      .advanced-top {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .adv-btn {
+        background: none;
+        border: 0;
+        cursor: pointer;
+        color: #777;
+        font-size: 0.62rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+      .advanced-grid {
+        margin-top: 1.1rem;
+        display: grid;
+        grid-template-columns: 1.35fr 1fr;
+        grid-template-areas:
+          "cat budget"
+          "vue vue";
+        gap: 1.45rem;
+      }
+      .adv-cat { grid-area: cat; }
+      .adv-budget { grid-area: budget; }
+      .adv-vue { grid-area: vue; }
+      .vue-superficie {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+      }
+      .label {
+        color: #7a7a7a;
+        font-size: 0.63rem;
+        letter-spacing: 0.19em;
+        text-transform: uppercase;
+        margin-bottom: 0.65rem;
+        font-weight: 600;
+      }
+      .entry-box {
+        border: 1px solid var(--line);
+        background: #fcfcfc;
+        padding: 0.9rem 0.95rem;
+        border-radius: 4px;
+      }
+      .entry-box input,
+      .entry-box select {
+        font-size: 0.95rem;
+      }
+      .stars {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.55rem;
+      }
+      .stars label {
+        border: 1px solid var(--line);
+        padding: 0.88rem 0.45rem;
+        text-align: center;
+        cursor: pointer;
+        font-size: 0.72rem;
+        color: #666;
+        background: #fff;
+      }
+      .stars input { display: none; }
+      .stars input:checked + span {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .stars label:has(input:checked) {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+      }
+      .range-wrap {
+        padding: 0.4rem 0.25rem 0;
+      }
+      .range {
+        width: 100%;
+      }
+      .range-value {
+        margin-top: 0.55rem;
+        text-align: right;
+        color: var(--accent);
+        font-size: 0.87rem;
+        font-weight: 600;
+      }
+      .msg {
+        max-width: var(--max);
+        margin: 1rem auto 0;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d8e7f1;
+        background: #f4faff;
+        color: #2d5164;
+        display: none;
+      }
+      .msg.err {
+        border-color: #e8d7d7;
+        background: #fff7f7;
+        color: #8b3f3f;
+      }
+      .destinations {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 2.2rem 1rem;
+      }
+      .section-title {
+        font-family: var(--serif);
+        font-size: 2.1rem;
+        margin: 0;
+      }
+      .section-sub {
+        margin-top: 0.35rem;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #8a8a8a;
+      }
+      .dest-grid {
+        margin-top: 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+      .dest {
+        aspect-ratio: 16/10;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+        background: linear-gradient(130deg, #506b88, #b0a595);
+        background-size: cover;
+        background-position: center;
+      }
+      .dest.royal-monceau {
+        background-image:
+          linear-gradient(to top, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.08)),
+          url("https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1400&q=80");
+      }
+      .dest.villa-deste {
+        background-image:
+          linear-gradient(to top, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.08)),
+          url("https://images.unsplash.com/photo-1501117716987-c8e1ecb2106c?auto=format&fit=crop&w=1400&q=80");
+      }
+      .dest.aman-tokyo {
+        background-image:
+          linear-gradient(to top, rgba(0, 0, 0, 0.26), rgba(0, 0, 0, 0.1)),
+          url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1400&q=80");
+      }
+      .dest::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.45), rgba(0,0,0,0.05));
+      }
+      .dest-txt {
+        position: absolute;
+        left: 0.8rem;
+        bottom: 0.7rem;
+        z-index: 1;
+        color: #fff;
+      }
+      .dest-txt small {
+        display: block;
+        font-size: 0.58rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.85;
+      }
+      .dest-txt strong {
+        font-family: var(--serif);
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+      .results-section {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0.5rem 1rem 2.2rem;
+      }
+      .results-section.is-empty {
+        display: none;
+      }
+      .results-section .section-title {
+        margin-bottom: 0.25rem;
+      }
+      .results-wrap {
+        margin-top: 1rem;
+      }
+      .results {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+      .room {
+        border: 1px solid var(--line);
+        background: #fff;
+        overflow: hidden;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
+      }
+      .room-ph {
+        aspect-ratio: 16/10;
+        position: relative;
+        overflow: hidden;
+        background: #e8eef2;
+      }
+      .room-ph img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .room-ph .img-fallback {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: #6d8ea2;
+        font-size: 0.64rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        background: linear-gradient(130deg, #d8e6ef, #f1eee9);
+      }
+      .room-ph .img-fallback[hidden] {
+        display: none;
+      }
+      .room-body { padding: 0.9rem 0.9rem 1rem; }
+      .room h3 {
+        margin: 0;
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 1.15rem;
+      }
+      .price {
+        margin-top: 0.3rem;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .meta {
+        margin-top: 0.35rem;
+        color: #616161;
+        font-size: 0.86rem;
+      }
+      .book {
+        margin-top: 0.8rem;
+        width: 100%;
+        border: 1px solid var(--accent);
+        background: var(--accent);
+        color: #fff;
+        padding: 0.65rem;
+        cursor: pointer;
+        font-size: 0.68rem;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+      .book:disabled { opacity: 0.6; cursor: not-allowed; }
+      .footer-features {
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        background: #fafafa;
+      }
+      .features {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+      .feature {
+        text-align: center;
+        padding: 0.6rem 0.8rem;
+      }
+      .feature h4 {
+        margin: 0.3rem 0 0.4rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .feature p {
+        margin: 0;
+        color: #787878;
+        font-size: 0.78rem;
+      }
+      @media (max-width: 980px) {
+        .search-main { grid-template-columns: 1fr; }
+        .field { border-right: 0; border-bottom: 1px solid var(--line); }
+        .advanced-grid {
+          grid-template-columns: 1fr;
+          grid-template-areas:
+            "cat"
+            "budget"
+            "vue";
+        }
+        .vue-superficie { grid-template-columns: 1fr; }
+        .dest-grid, .results, .features { grid-template-columns: 1fr; }
+        .go { margin: 0.9rem; min-height: 52px; min-width: 0; }
+        .top-inner { flex-wrap: wrap; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <div class="top-inner">
+        <div class="logo">◇ e-HÔTELS</div>
+        <nav class="nav">
+          <a class="active" href="/client-recherche.html">Recherche</a>
+          <a href="/client-reservations.html">Mes Réservations</a>
+        </nav>
+        <div class="right">
+          <span id="userName">CLIENT</span>
+          <button class="logout" id="btnLogout" type="button">Déconnexion</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero-wrap">
+      <div class="hero">
+        <span class="chip">Excellence & Sérénité</span>
+        <h1>Où devons-nous<br />vous emmener ?</h1>
+        <p class="sub">DÉCOUVREZ NOTRE SÉLECTION EXCLUSIVE D'HÔTELS D'EXCEPTION À TRAVERS LE MONDE.</p>
+
+        <form id="searchForm">
+          <div class="search">
+            <div class="search-main">
+              <div class="field">
+                <div class="fl">Chaîne hôtelière</div>
+                <div class="fv">
+                  <select id="nom_chaine" name="nom_chaine" required>
+                    <option value="">Choisir une chaîne</option>
+                    <option value="LuxHorizon">LuxHorizon</option>
+                    <option value="EcoStay">EcoStay</option>
+                    <option value="RoyalPalace">RoyalPalace</option>
+                    <option value="UrbanNest">UrbanNest</option>
+                    <option value="ZenithResorts">ZenithResorts</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <div class="fl">Dates de séjour</div>
+                <div class="fv dates">
+                  <input id="date_debut" name="date_debut" type="date" required />
+                  <input id="date_fin" name="date_fin" type="date" required />
+                </div>
+              </div>
+              <div class="field">
+                <div class="fl">Capacité</div>
+                <div class="fv">
+                  <select id="capacite" name="capacite" required>
+                    <option value="">Choisir</option>
+                    <option value="simple">1 adulte (Simple)</option>
+                    <option value="double">2 adultes (Double)</option>
+                    <option value="suite">Suite</option>
+                  </select>
+                </div>
+              </div>
+              <button class="go" type="submit" id="btnSearch">Explorer</button>
+            </div>
+          </div>
+
+          <div class="search-advanced">
+            <div class="advanced">
+              <div class="advanced-top">
+                <button class="adv-btn" type="button" id="toggleAdvanced">Filtres avancés</button>
+              </div>
+              <div class="advanced-grid" id="advancedGrid">
+                <div class="adv-cat">
+                  <div class="label">Catégorie d'établissement</div>
+                  <div class="stars">
+                    <label><input type="radio" name="categorie" value="1" /><span>1 ★</span></label>
+                    <label><input type="radio" name="categorie" value="2" /><span>2 ★</span></label>
+                    <label><input type="radio" name="categorie" value="3" checked /><span>3 ★</span></label>
+                    <label><input type="radio" name="categorie" value="4" /><span>4 ★</span></label>
+                    <label><input type="radio" name="categorie" value="5" /><span>5 ★</span></label>
+                  </div>
+                </div>
+                <div class="adv-budget">
+                  <div class="label">Budget par nuit</div>
+                  <div class="range-wrap">
+                    <input class="range" id="prix_max" name="prix_max" type="range" min="30" max="3000" step="10" value="1200" />
+                    <div class="range-value" id="prixMaxLabel">Jusqu'à 1200 €</div>
+                  </div>
+                </div>
+                <div class="adv-vue">
+                  <div class="vue-superficie">
+                    <div class="entry-box">
+                      <div class="label">Vue</div>
+                      <select id="vue" name="vue">
+                        <option value="">Toutes les vues</option>
+                        <option value="mer">Mer</option>
+                        <option value="montagne">Montagne</option>
+                        <option value="ville">Ville</option>
+                        <option value="jardin">Jardin</option>
+                      </select>
+                    </div>
+                    <div class="entry-box">
+                      <div class="label">Superficie min (m²)</div>
+                      <input id="superficie_min" name="superficie_min" type="number" min="0" step="1" placeholder="Ex. 30" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+    <section class="results-section is-empty" id="resultsSection" aria-labelledby="resultsHeading">
+      <h2 class="section-title" id="resultsHeading">Résultats de recherche</h2>
+      <div class="section-sub" id="resultsSub">Les chambres correspondant à vos critères.</div>
+      <div class="results-wrap">
+        <div class="results" id="results"></div>
+      </div>
+    </section>
+
+    <section class="destinations">
+      <h2 class="section-title">Destinations de Saison</h2>
+      <div class="section-sub">Nos curateurs ont sélectionné le meilleur pour vous.</div>
+      <div class="dest-grid">
+        <article class="dest royal-monceau"><div class="dest-txt"><small>Paris, France</small><strong>Le Royal Monceau</strong></div></article>
+        <article class="dest villa-deste"><div class="dest-txt"><small>Lac de Côme, Italie</small><strong>Villa d'Este</strong></div></article>
+        <article class="dest aman-tokyo"><div class="dest-txt"><small>Tokyo, Japon</small><strong>Aman Tokyo</strong></div></article>
+      </div>
+    </section>
+
+    <section class="footer-features">
+      <div class="features">
+        <article class="feature">
+          <h4>Service de conciergerie</h4>
+          <p>Une assistance personnelle disponible à tout moment pour orchestrer votre séjour.</p>
+        </article>
+        <article class="feature">
+          <h4>Expérience sur mesure</h4>
+          <p>Des recommandations et attentions adaptées précisément à vos préférences.</p>
+        </article>
+        <article class="feature">
+          <h4>Emplacements uniques</h4>
+          <p>Une présence dans les adresses les plus exclusives et les destinations signatures.</p>
+        </article>
+      </div>
+    </section>
+
+    <script>
+      const LS_ID = "ehotels.userId";
+      const LS_ROLE = "ehotels.role";
+      const LS_HOTEL = "ehotels.hotelId";
+      let lastSearch = null;
+
+      function mustBeLoggedIn() {
+        const id = localStorage.getItem(LS_ID);
+        const role = (localStorage.getItem(LS_ROLE) || "").toLowerCase();
+        if (!id || role !== "client") window.location.href = "/login.html";
+        return { id, role };
+      }
+
+      function setMsg(kind, text) {
+        const el = document.getElementById("msg");
+        el.className = "msg" + (kind === "err" ? " err" : "");
+        el.textContent = text;
+        el.style.display = "block";
+      }
+
+      function clearMsg() {
+        const el = document.getElementById("msg");
+        el.style.display = "none";
+      }
+
+      function qs(obj) {
+        const p = new URLSearchParams();
+        Object.entries(obj).forEach(([k, v]) => {
+          if (v === undefined || v === null) return;
+          const s = String(v).trim();
+          if (s) p.set(k, s);
+        });
+        return p.toString();
+      }
+
+      function pickField(r, keys) {
+        for (const k of keys) {
+          if (r && r[k] != null && String(r[k]).trim() !== "") return r[k];
+        }
+        return null;
+      }
+
+      function fmtDate(value) {
+        try {
+          const d = new Date(value);
+          if (Number.isNaN(d.getTime())) return String(value);
+          return d.toLocaleDateString("fr-FR");
+        } catch {
+          return String(value);
+        }
+      }
+
+      const ROOM_IMAGES = [
+        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1611892440504-42a792e54d34?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=900&q=80",
+      ];
+
+      function imageUrlForRoom(room, listIndex) {
+        const id = pickField(room, ["id_chambre", "ID_CHAMBRE"]);
+        const n = Number(id);
+        const idx = Number.isFinite(n) ? Math.abs(n) % ROOM_IMAGES.length : listIndex % ROOM_IMAGES.length;
+        return ROOM_IMAGES[idx];
+      }
+
+      function buildRoomCard(room, listIndex) {
+        const idChambre = pickField(room, ["id_chambre", "ID_CHAMBRE", "id", "ID"]);
+        const prix = pickField(room, ["prix", "PRIX", "prix_nuit", "prixParNuit", "tarif"]);
+        const cap = pickField(room, ["capacite", "CAPACITE", "type", "TYPE_CHAMBRE", "categorie_chambre"]);
+        const vue = pickField(room, ["vue", "VUE", "view"]);
+        const commodites = pickField(room, ["commodites", "COMMODITES", "amenities", "equipements"]);
+        const chaine = pickField(room, ["chaine_nom", "CHAINE_NOM"]);
+        const hotelNom = pickField(room, ["nom", "NOM", "zone", "ZONE"]);
+        const adresse = pickField(room, ["adresse", "ADRESSE"]);
+
+        const div = document.createElement("article");
+        div.className = "room";
+        const imgSrc = imageUrlForRoom(room, listIndex);
+        div.innerHTML =
+          '<div class="room-ph">' +
+          '<img src="" alt="" loading="lazy" />' +
+          '<div class="img-fallback" hidden>Photo</div>' +
+          "</div>" +
+          '<div class="room-body">' +
+          "<h3></h3>" +
+          '<div class="price"></div>' +
+          '<div class="meta"></div>' +
+          '<div class="meta hotel-line" style="font-size:0.8rem"></div>' +
+          '<div class="meta" style="font-size:0.8rem"></div>' +
+          '<button type="button" class="book">Réserver</button>' +
+          "</div>";
+
+        const img = div.querySelector(".room-ph img");
+        const fallback = div.querySelector(".img-fallback");
+        img.alt = "Chambre d'hôtel — séjour e-Hôtels";
+        img.src = imgSrc;
+        img.addEventListener("error", () => {
+          img.removeAttribute("src");
+          fallback.hidden = false;
+        });
+
+        const titleBits = ["Chambre #" + (idChambre || "—")];
+        if (chaine) titleBits.push(String(chaine));
+        div.querySelector("h3").textContent = titleBits.join(" · ");
+        div.querySelector(".price").textContent = (prix != null ? prix + " € / nuit" : "Tarif sur demande");
+        div.querySelectorAll(".meta")[0].textContent = "Capacité : " + (cap || "—") + " · Vue : " + (vue || "—");
+        const hotelParts = [hotelNom, adresse].filter(Boolean);
+        const hotelEl = div.querySelector(".hotel-line");
+        if (hotelParts.length) {
+          hotelEl.textContent = hotelParts.join(" · ");
+        } else {
+          hotelEl.style.display = "none";
+        }
+        div.querySelectorAll(".meta")[2].textContent = "Commodités : " + (commodites || "—");
+
+        const btn = div.querySelector(".book");
+        btn.addEventListener("click", async () => {
+          clearMsg();
+          const idClientRaw = localStorage.getItem(LS_ID);
+          const idClientNum = parseInt(String(idClientRaw), 10);
+          const idChambreNum = parseInt(String(idChambre), 10);
+          if (!idClientRaw || !lastSearch) {
+            setMsg("err", "Informations insuffisantes pour réserver. Reconnectez-vous ou relancez une recherche.");
+            return;
+          }
+          if (!Number.isFinite(idClientNum) || !Number.isFinite(idChambreNum)) {
+            setMsg("err", "Identifiant client ou chambre invalide.");
+            return;
+          }
+          if (!lastSearch.date_debut || !lastSearch.date_fin) {
+            setMsg("err", "Dates de séjour manquantes. Effectuez une recherche avec des dates.");
+            return;
+          }
+          btn.disabled = true;
+          try {
+            const payload = {
+              id_client: idClientNum,
+              id_chambre: idChambreNum,
+              date_debut: lastSearch.date_debut,
+              date_fin: lastSearch.date_fin,
+            };
+            const res = await fetch("/reservations", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const t = await res.text();
+            let d = null;
+            try { d = t ? JSON.parse(t) : null; } catch { d = null; }
+            if (!res.ok) {
+              const m = (d && (d.error || d.message)) || "Réservation impossible.";
+              setMsg("err", m);
+              btn.disabled = false;
+              return;
+            }
+            if (res.status !== 201) {
+              setMsg("err", "Réponse inattendue du serveur.");
+              btn.disabled = false;
+              return;
+            }
+            const ref = (d && (d.id_reservation || d.ID_RESERVATION || d.id || d.numero)) || "";
+            setMsg("", "Réservation enregistrée" + (ref ? " — n° " + ref : "") + " (" + fmtDate(lastSearch.date_debut) + " → " + fmtDate(lastSearch.date_fin) + ").");
+            btn.disabled = false;
+          } catch {
+            setMsg("err", "Erreur réseau lors de la réservation.");
+            btn.disabled = false;
+          }
+        });
+
+        return div;
+      }
+
+      (function init() {
+        const { id } = mustBeLoggedIn();
+        const username = localStorage.getItem("ehotels.nom") || ("Client #" + id);
+        document.getElementById("userName").textContent = username.toUpperCase();
+
+        document.getElementById("btnLogout").addEventListener("click", () => {
+          localStorage.removeItem(LS_ID);
+          localStorage.removeItem(LS_ROLE);
+          localStorage.removeItem(LS_HOTEL);
+          localStorage.removeItem("ehotels.nom");
+          window.location.href = "/login.html";
+        });
+
+        const prix = document.getElementById("prix_max");
+        const prixLabel = document.getElementById("prixMaxLabel");
+        prix.addEventListener("input", () => {
+          prixLabel.textContent = "Jusqu'à " + prix.value + " €";
+        });
+
+        const advBtn = document.getElementById("toggleAdvanced");
+        const advGrid = document.getElementById("advancedGrid");
+        let advOpen = true;
+        advBtn.addEventListener("click", () => {
+          advOpen = !advOpen;
+          advGrid.style.display = advOpen ? "grid" : "none";
+        });
+
+        document.getElementById("searchForm").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          clearMsg();
+
+          const date_debut = document.getElementById("date_debut").value;
+          const date_fin = document.getElementById("date_fin").value;
+          const capacite = document.getElementById("capacite").value;
+          const vue = document.getElementById("vue").value;
+          const prix_max = document.getElementById("prix_max").value;
+          const categorie = document.querySelector('input[name="categorie"]:checked')?.value || "1";
+          const superficie_min = document.getElementById("superficie_min").value;
+          const nom_chaine = document.getElementById("nom_chaine").value;
+
+          if (!nom_chaine || !date_debut || !date_fin || !capacite) {
+            setMsg("err", "Veuillez renseigner la chaîne, les dates et la capacité.");
+            return;
+          }
+          if (new Date(date_fin) < new Date(date_debut)) {
+            setMsg("err", "La date de fin doit être postérieure à la date de début.");
+            return;
+          }
+
+          const params = { date_debut, date_fin, capacite, vue, prix_max, categorie, superficie_min, nom_chaine };
+          lastSearch = params;
+          const url = "/chambres/disponibles?" + qs(params);
+
+          const results = document.getElementById("results");
+          const resultsSection = document.getElementById("resultsSection");
+          const resultsSub = document.getElementById("resultsSub");
+          results.innerHTML = "";
+          const btn = document.getElementById("btnSearch");
+          btn.disabled = true;
+
+          try {
+            const res = await fetch(url);
+            const t = await res.text();
+            let d = null;
+            try { d = t ? JSON.parse(t) : null; } catch { d = null; }
+            if (!res.ok) {
+              const m = (d && (d.error || d.message)) || "Impossible de charger les chambres.";
+              setMsg("err", m);
+              resultsSection.classList.add("is-empty");
+              btn.disabled = false;
+              return;
+            }
+            resultsSection.classList.remove("is-empty");
+            const rows = Array.isArray(d) ? d : d?.rows || d?.data || [];
+            if (!rows.length) {
+              resultsSub.textContent = "Aucun résultat pour cette recherche.";
+              const empty = document.createElement("p");
+              empty.style.cssText = "grid-column:1/-1;text-align:center;color:#888;padding:2rem;font-weight:300;";
+              empty.textContent = "Aucune chambre disponible pour ces critères. Modifiez vos filtres ou vos dates.";
+              results.appendChild(empty);
+              setMsg("", "Aucune chambre disponible pour ces critères.");
+              btn.disabled = false;
+              return;
+            }
+            resultsSub.textContent = rows.length + " chambre(s) correspondant à votre recherche.";
+            setMsg("", rows.length + " chambre(s) trouvée(s).");
+            rows.forEach((r, i) => results.appendChild(buildRoomCard(r, i)));
+            btn.disabled = false;
+          } catch {
+            setMsg("err", "Erreur réseau : serveur injoignable.");
+            resultsSection.classList.add("is-empty");
+            btn.disabled = false;
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

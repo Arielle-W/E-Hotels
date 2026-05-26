@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tableau de bord — e-Hôtels</title>
+    <style>
+      :root {
+        --blue: #0d7bc4;
+        --blue-soft: rgba(13, 123, 196, 0.14);
+        --blue-fill: rgba(13, 123, 196, 0.18);
+        --ink: #1a1a1a;
+        --muted: #6b6b6b;
+        --line: #e8eaed;
+        --paper: #f6f7f9;
+        --card: #fff;
+        --sans: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+        --serif: Georgia, "Times New Roman", ui-serif, serif;
+        --sidebar: 268px;
+        --max: 1280px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.9375rem;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: var(--sidebar) 1fr;
+        min-height: 100vh;
+      }
+      aside {
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 1.5rem 1.1rem;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+      }
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        text-decoration: none;
+        color: var(--ink);
+      }
+      .logo-diamond {
+        width: 10px;
+        height: 10px;
+        background: var(--blue);
+        transform: rotate(45deg);
+      }
+      .logo-text {
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        color: var(--blue);
+      }
+      .nav-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        margin-bottom: 0.65rem;
+        font-weight: 600;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.65rem 0.75rem;
+        border-radius: 8px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.2rem;
+      }
+      .nav-item:hover {
+        background: var(--paper);
+        color: var(--ink);
+      }
+      .nav-item.active {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      .nav-item.active svg {
+        stroke: var(--blue);
+      }
+      .sidebar-hotel {
+        margin-top: auto;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+      .sidebar-hotel strong {
+        display: block;
+        color: var(--ink);
+        font-size: 0.75rem;
+        margin-top: 0.35rem;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        line-height: 1.35;
+      }
+      .main-col {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .top-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.85rem 1.5rem;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+      }
+      .top-header .brand {
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
+        color: var(--blue);
+      }
+      .user-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .user-name {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .btn-icon {
+        border: 1px solid var(--line);
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+      }
+      .btn-icon:hover {
+        color: var(--blue);
+      }
+      .topbar {
+        display: none;
+      }
+      main {
+        flex: 1;
+        padding: 1.5rem 1.5rem 2.5rem;
+        max-width: var(--max);
+        margin: 0 auto;
+        width: 100%;
+      }
+      .page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(1.75rem, 3vw, 2.35rem);
+        font-weight: 500;
+        letter-spacing: 0.02em;
+      }
+      .page-sub {
+        margin: 0.45rem 0 0;
+        font-size: 0.68rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .head-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .btn-ghost {
+        border: 1px solid var(--line);
+        background: var(--card);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn-ghost:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .btn-primary {
+        border: none;
+        background: var(--blue);
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        font-family: inherit;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+      }
+      .btn-primary:hover {
+        filter: brightness(0.95);
+      }
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      @media (max-width: 960px) {
+        .kpi-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .kpi {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.2rem 1.25rem;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .kpi-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--blue-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: var(--blue);
+      }
+      .kpi-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .kpi-val {
+        font-size: 1.85rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-top: 0.2rem;
+      }
+      .kpi-sub {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 0.35rem;
+      }
+      .kpi-sub.pos {
+        color: #1a7f4c;
+      }
+      .mid-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        align-items: stretch;
+      }
+      @media (max-width: 1024px) {
+        .mid-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.25rem 1.35rem;
+      }
+      .panel h2 {
+        margin: 0;
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        font-weight: 800;
+      }
+      .panel .sub {
+        margin: 0.35rem 0 1rem;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .panel-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .link-arrow {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--blue);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .link-arrow:hover {
+        text-decoration: underline;
+      }
+      .chart-wrap {
+        height: 220px;
+        position: relative;
+      }
+      .chart-wrap svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .chart-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.65rem;
+        color: var(--muted);
+        margin-top: 0.35rem;
+        padding: 0 0.25rem;
+      }
+      .res-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .res-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .res-item:last-child {
+        border-bottom: none;
+      }
+      .res-av {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--line);
+        flex-shrink: 0;
+      }
+      .res-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .res-name {
+        font-weight: 700;
+        font-size: 0.88rem;
+      }
+      .res-meta {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 0.15rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .res-price {
+        font-weight: 700;
+        font-size: 0.88rem;
+        text-align: right;
+      }
+      .pill {
+        display: inline-block;
+        margin-top: 0.25rem;
+        font-size: 0.58rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        padding: 0.2rem 0.45rem;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+      }
+      .pill.ok {
+        border-color: #b8dcc8;
+        background: #f0faf3;
+        color: #1a7f4c;
+      }
+      .pill.wait {
+        border-color: #e8d4a8;
+        background: #fffbf0;
+        color: #946c00;
+      }
+      .pill.done {
+        border-color: #d0d0d0;
+        background: #f5f5f5;
+        color: #555;
+      }
+      .quick-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+      }
+      @media (max-width: 900px) {
+        .quick-row {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 480px) {
+        .quick-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .quick-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: left;
+      }
+      .quick-card h3 {
+        margin: 0;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      .quick-card p {
+        margin: 0.4rem 0 0;
+        font-size: 0.8rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .quick-ic {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--paper);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.65rem;
+        color: var(--blue);
+      }
+      .site-footer {
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.65rem;
+        color: #999;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .site-footer a {
+        color: #999;
+        text-decoration: none;
+        margin-left: 1rem;
+      }
+      .site-footer a:hover {
+        color: var(--blue);
+      }
+      .msg {
+        padding: 1rem;
+        border-radius: 8px;
+        background: #fff5f5;
+        border: 1px solid #f0c4c4;
+        color: #8b2e2e;
+        margin-bottom: 1rem;
+        display: none;
+      }
+      .msg.show {
+        display: block;
+      }
+      .toggle {
+        display: none;
+      }
+      @media (max-width: 940px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: min(300px, 88vw);
+          transform: translateX(-105%);
+          transition: transform 0.25s ease;
+          z-index: 40;
+          box-shadow: 8px 0 32px rgba(0, 0, 0, 0.08);
+        }
+        body.nav-open aside {
+          transform: translateX(0);
+        }
+        .topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: var(--card);
+          border-bottom: 1px solid var(--line);
+          position: sticky;
+          top: 0;
+          z-index: 20;
+        }
+        .toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 2.75rem;
+          height: 2.5rem;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: #fff;
+          cursor: pointer;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside aria-label="Navigation gestionnaire">
+        <a class="logo-row" href="/manager-dashboard.html">
+          <span class="logo-diamond" aria-hidden="true"></span>
+          <span class="logo-text">E-HÔTELS</span>
+        </a>
+        <div class="nav-label">MENU</div>
+        <nav>
+          <a class="nav-item active" href="/manager-dashboard.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="9" />
+              <rect x="14" y="3" width="7" height="5" />
+              <rect x="14" y="12" width="7" height="9" />
+              <rect x="3" y="16" width="7" height="5" />
+            </svg>
+            Tableau de bord
+          </a>
+          <a class="nav-item" href="/admin-employes.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Employés
+          </a>
+          <a class="nav-item" href="/admin-chambres.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M2 20h20M4 20V10l8-6 8 6v10" />
+              <path d="M9 20v-6h6v6" />
+            </svg>
+            Chambres
+          </a>
+          <a class="nav-item" href="/admin-clients.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Clients
+          </a>
+        </nav>
+        <div class="sidebar-hotel">
+          HÔTEL ACTUEL
+          <strong id="sidebarHotel">—</strong>
+        </div>
+      </aside>
+
+      <div class="main-col">
+        <div class="topbar">
+          <button class="toggle" type="button" id="btnMenu" aria-label="Menu">☰</button>
+          <span class="brand">E-HÔTELS</span>
+          <span style="width: 2.75rem"></span>
+        </div>
+        <header class="top-header">
+          <span class="brand">E-HÔTELS</span>
+          <div class="user-row">
+            <span class="user-name" id="headerUser">GESTIONNAIRE</span>
+            <button type="button" class="btn-icon" id="btnLogout" title="Déconnexion" aria-label="Déconnexion">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <main>
+          <div class="msg" id="msg"></div>
+
+          <div class="page-head">
+            <div>
+              <h1>Tableau de bord</h1>
+              <p class="page-sub" id="pageSub">—</p>
+            </div>
+            <div class="head-actions">
+              <button type="button" class="btn-ghost" disabled title="Bientôt">Exporter PDF</button>
+              <a class="btn-primary" href="/admin-employes.html">Nouvel employé</a>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="kpi-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div>
+                <div class="kpi-label">EFFECTIF TOTAL</div>
+                <div class="kpi-val" id="kpiEmp">—</div>
+                <div class="kpi-sub" id="kpiEmpSub">Employés enregistrés pour cet hôtel</div>
+              </div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4" />
+                </svg>
+              </div>
+              <div>
+                <div class="kpi-label">INVENTAIRE CHAMBRES</div>
+                <div class="kpi-val" id="kpiRooms">—</div>
+                <div class="kpi-sub" id="kpiOccSub">—</div>
+              </div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+              </div>
+              <div>
+                <div class="kpi-label">REVENUS MENSUELS</div>
+                <div class="kpi-val" id="kpiRev">—</div>
+                <div class="kpi-sub" id="kpiRevSub">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mid-row">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>PERFORMANCE D'OCCUPATION</h2>
+                  <p class="sub">Analyse sur 7 jours (réservations + locations actives)</p>
+                </div>
+                <a class="link-arrow" href="/manager-dashboard.html">Rapport complet →</a>
+              </div>
+              <div class="chart-wrap" id="chartWrap">
+                <svg id="chartSvg" viewBox="0 0 560 200" preserveAspectRatio="none"></svg>
+              </div>
+              <div class="chart-labels" id="chartLabels"></div>
+            </div>
+            <div class="panel">
+              <h2>RÉSERVATIONS RÉCENTES</h2>
+              <p class="sub">Dernières entrées pour votre établissement</p>
+              <ul class="res-list" id="resList"></ul>
+              <a class="link-arrow" href="/admin-clients.html" style="display: inline-block; margin-top: 0.75rem">Voir tout l'historique →</a>
+            </div>
+          </div>
+
+          <div class="quick-row">
+            <div class="quick-card">
+              <div class="quick-ic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M2 4v16M2 8h20M6 4v16" />
+                </svg>
+              </div>
+              <h3>Gérer l'inventaire</h3>
+              <p id="quickInv">—</p>
+            </div>
+            <div class="quick-card">
+              <div class="quick-ic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                </svg>
+              </div>
+              <h3>Planning équipe</h3>
+              <p id="quickTeam">—</p>
+            </div>
+            <div class="quick-card">
+              <div class="quick-ic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg>
+              </div>
+              <h3>Consulter revenus</h3>
+              <p id="quickRev">—</p>
+            </div>
+            <div class="quick-card">
+              <div class="quick-ic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+              </div>
+              <h3>Maintenance</h3>
+              <p id="quickMaint">—</p>
+            </div>
+          </div>
+
+          <footer class="site-footer">
+            <span>© 2026 E-HÔTELS EXCELLENCE GROUP</span>
+            <span>
+              <a href="#">Privacy</a>
+              <a href="#">Terms</a>
+              <a href="#">Concierge</a>
+            </span>
+          </footer>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const LS_ID = "ehotels.userId";
+      const LS_ROLE = "ehotels.role";
+      const LS_HOTEL = "ehotels.hotelId";
+      const LS_NAME = "ehotels.nom";
+
+      function normalizeRole(r) {
+        return String(r || "").trim().toLowerCase();
+      }
+
+      function mustBeManager() {
+        const id = localStorage.getItem(LS_ID);
+        const role = normalizeRole(localStorage.getItem(LS_ROLE));
+        const hotelId = localStorage.getItem(LS_HOTEL);
+        if (!id || !role) {
+          window.location.href = "/login.html";
+          return null;
+        }
+        if (role !== "gestionnaire" && role !== "manager") {
+          if (role === "client") window.location.href = "/client-recherche.html";
+          else window.location.href = "/employe-reservations.html";
+          return null;
+        }
+        if (!hotelId) {
+          document.getElementById("msg").textContent =
+            "Session sans hôtel : reconnectez-vous avec un compte gestionnaire associé à un établissement.";
+          document.getElementById("msg").classList.add("show");
+          return null;
+        }
+        return { id, hotelId };
+      }
+
+      function fmtEuro(n) {
+        return (
+          Math.round(n).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " €"
+        );
+      }
+
+      function shortName(s) {
+        const p = String(s || "").trim().split(/\s+/);
+        if (p.length < 2) return s || "—";
+        return p[0].charAt(0).toUpperCase() + ". " + p[p.length - 1];
+      }
+
+      function renderChart(series) {
+        const svg = document.getElementById("chartSvg");
+        const labels = document.getElementById("chartLabels");
+        labels.innerHTML = "";
+        if (!series || !series.length) {
+          svg.innerHTML = "";
+          return;
+        }
+        const W = 560;
+        const H = 200;
+        const pad = 24;
+        const max = 100;
+        const pts = series.map((row, i) => {
+          const x = pad + (i * (W - 2 * pad)) / Math.max(1, series.length - 1);
+          const y = H - pad - (row.pct / max) * (H - 2 * pad);
+          return { x, y, pct: row.pct, day: row.day };
+        });
+        const pathD = pts.map((p, i) => (i === 0 ? "M" : "L") + p.x + "," + p.y).join(" ");
+        const areaD =
+          pathD +
+          " L" +
+          pts[pts.length - 1].x +
+          "," +
+          (H - pad) +
+          " L" +
+          pts[0].x +
+          "," +
+          (H - pad) +
+          " Z";
+        const days = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+        pts.forEach((p) => {
+          const d = new Date(p.day);
+          const el = document.createElement("span");
+          el.textContent = days[d.getDay()] || "";
+          labels.appendChild(el);
+        });
+        svg.innerHTML =
+          '<defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%" stop-color="#0d7bc4" stop-opacity="0.25"/>' +
+          '<stop offset="100%" stop-color="#0d7bc4" stop-opacity="0.02"/>' +
+          "</linearGradient></defs>" +
+          '<path d="' +
+          areaD +
+          '" fill="url(#gfill)" stroke="none"/>' +
+          '<path d="' +
+          pathD +
+          '" fill="none" stroke="#0d7bc4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+          pts
+            .map(
+              (p) =>
+                '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" fill="#fff" stroke="#0d7bc4" stroke-width="2"/>'
+            )
+            .join("");
+      }
+
+      function pillClass(st) {
+        if (st === "CONFIRMÉ") return "pill ok";
+        if (st === "TERMINÉ") return "pill done";
+        return "pill wait";
+      }
+
+      async function load() {
+        const session = mustBeManager();
+        if (!session) return;
+
+        const nom = localStorage.getItem(LS_NAME);
+        document.getElementById("headerUser").textContent = nom
+          ? String(nom).toUpperCase().replace(/\s+/g, " ")
+          : "GESTIONNAIRE";
+
+        const now = new Date();
+        const sub =
+          now.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) +
+          " · ";
+        document.getElementById("pageSub").textContent = sub + "Chargement…";
+
+        try {
+          const res = await fetch("/manager/hotel/" + encodeURIComponent(session.hotelId) + "/dashboard");
+          const data = await res.json();
+          if (!res.ok) {
+            document.getElementById("msg").textContent = data.message || data.error || "Erreur de chargement.";
+            document.getElementById("msg").classList.add("show");
+            return;
+          }
+
+          const h = data.hotel || {};
+          document.getElementById("sidebarHotel").textContent =
+            (h.nom || "") + (h.adresse ? " — " + h.adresse : "") || "Réf. #" + session.hotelId;
+          document.getElementById("pageSub").textContent =
+            sub + (h.nom ? h.nom.toUpperCase() : "HÔTEL #" + session.hotelId);
+
+          document.getElementById("kpiEmp").textContent = String(data.employes_count ?? "—");
+          document.getElementById("kpiRooms").textContent = String(data.chambres_count ?? "—");
+          document.getElementById("kpiOccSub").textContent =
+            (data.occupancy_today_pct ?? 0) + "% Taux d'occupation aujourd'hui (" + (data.chambres_occupees_aujourdhui || 0) + " ch.)";
+
+          document.getElementById("kpiRev").textContent = fmtEuro(data.revenue_month || 0);
+          const g = data.revenue_growth_pct;
+          const gSub =
+            g == null
+              ? "Comparaison mois précédent : " + fmtEuro(data.revenue_prev_month || 0)
+              : (g >= 0 ? "+" : "") + g + "% vs mois dernier (précédent : " + fmtEuro(data.revenue_prev_month || 0) + ")";
+          const elRevSub = document.getElementById("kpiRevSub");
+          elRevSub.textContent = gSub;
+          if (g != null && g > 0) elRevSub.classList.add("pos");
+
+          renderChart(data.occupancy_week || []);
+
+          const ul = document.getElementById("resList");
+          ul.innerHTML = "";
+          const rows = data.recent_reservations || [];
+          if (!rows.length) {
+            const li = document.createElement("li");
+            li.className = "res-item";
+            li.innerHTML = "<div class='res-body'><div class='res-name'>Aucune réservation récente</div></div>";
+            ul.appendChild(li);
+          } else {
+            rows.slice(0, 5).forEach((r) => {
+              const li = document.createElement("li");
+              li.className = "res-item";
+              const st = r.statut || "—";
+              li.innerHTML =
+                "<span class='res-av' aria-hidden='true'></span>" +
+                "<div class='res-body'>" +
+                "<div class='res-name'></div>" +
+                "<div class='res-meta'>CHAMBRE " +
+                (r.id_chambre || "—") +
+                (r.vue ? " · " + String(r.vue).toUpperCase() : "") +
+                "</div>" +
+                "<span class='" +
+                pillClass(st) +
+                "'>" +
+                st +
+                "</span>" +
+                "</div>" +
+                "<div class='res-price'></div>";
+              li.querySelector(".res-name").textContent = shortName(r.client_nom);
+              li.querySelector(".res-price").textContent = fmtEuro(r.tarif_estime || 0);
+              ul.appendChild(li);
+            });
+          }
+
+          document.getElementById("quickInv").textContent =
+            (data.chambres_pretes ?? 0) + " chambre(s) au statut disponible";
+          document.getElementById("quickTeam").textContent =
+            (data.employes_count ?? 0) + " collaborateur(s) enregistré(s)";
+          const rt = data.revenue_today || 0;
+          document.getElementById("quickRev").textContent =
+            (rt > 0 ? "+" : "") + fmtEuro(rt).replace(" ", "\u00a0") + " (locations du jour)";
+          document.getElementById("quickMaint").textContent =
+            (data.maintenance_count ?? 0) + " chambre(s) hors statut disponible";
+        } catch (e) {
+          document.getElementById("msg").textContent = "Impossible de joindre le serveur.";
+          document.getElementById("msg").classList.add("show");
+        }
+      }
+
+      document.getElementById("btnLogout").addEventListener("click", () => {
+        localStorage.removeItem(LS_ID);
+        localStorage.removeItem(LS_ROLE);
+        localStorage.removeItem(LS_HOTEL);
+        localStorage.removeItem(LS_NAME);
+        window.location.href = "/login.html";
+      });
+      document.getElementById("btnMenu")?.addEventListener("click", () => document.body.classList.toggle("nav-open"));
+
+      load();
+    </script>
+  </body>
+</html>
