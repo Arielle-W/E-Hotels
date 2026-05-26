@@ -12,8 +12,8 @@ A full-stack hotel reservation and operations system built for **CSI 2532 (Datab
 |---|---|
 | **Course** | CSI 2532 — Database fundamentals (relational model, SQL, application–database integration) |
 | **Institution** | University of Ottawa, Faculty of Engineering |
-| **Project type** | Term project — schema design through queries to web UI |
-| **Author** | Wabo Souoguem Claude Arielle — Software Engineering student |
+| **Project type** | Term project-schema design through queries to web UI |
+| **Author** | Wabo Souoguem Claude Arielle -Software Engineering student |
 
 
 ---
